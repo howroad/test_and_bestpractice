@@ -1,0 +1,490 @@
+//合同修正查看页面
+$(function(){
+	var planPay = $("[id='gdt_contractAmeLook_planPay.planNo']");
+	var planPay2 = $("[id='gdt_contractAmeLook_otherPlan.planNo']");
+	var bussVariety = $("input[id$='_form1.bussVariety']").val();
+	if(bussVariety == "CLMS10"){
+		planPay.remove();
+		if(planPay2.length == 1){
+			$("span[id^='gdt_contractAmeLook_otherPlan']").html("是否调整还本付息计划：否");
+			$("div[id^='gdt_contractAmeLook_otherPlan']").hide();
+//			$("td[id^='gdt_contractAmeLook_planPay']").parents("tr").first().remove();
+		}
+		$("div[id^='gdt_contractAmeLook_planPay']").parents("tr").remove();
+	}else{
+		if(planPay.length == 1){
+			$("span[id^='gdt_contractAmeLook_planPay']").html("是否调整还本付息计划：否");
+			$("div[id^='gdt_contractAmeLook_planPay']").hide();
+		}
+		$("div[id^='gdt_contractAmeLook_otherPlan']").parents("tr").remove();
+	}
+	var changeType = $("[id$='_form.changeType']").val();
+	if(changeType == '1'){
+		$("[id$='protocolNo']").parents("tr").first().remove();
+	}
+//	$("div[id$='_way']").hide();
+//	
+////	var pageCode = $("input[id=pageCode]").val();
+//	if(bussVariety == 'CLMS01'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		$("div[id$='_credit']").remove();
+//	}
+//	
+//	if(bussVariety == 'CLMS02'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		$("div[id$='_credit']").remove();
+//	}
+//	
+//	if(bussVariety == 'CLMS03'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		$("div[id$='_credit']").remove();
+//	}
+//	
+//	if(bussVariety == 'CLMS04'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS05'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//		
+//		var Obj = $('table[id=gdt_contractAmeLook_fees]')[0];
+//		var rowObj = Obj.rows;
+//		if(rowObj.length == 2){
+//			$("div[id$='_fees']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS06'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS07'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_credit']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_fees]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_fees']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS08'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_credit']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_fees]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_fees']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS09'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		
+//		var tableObj1 = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj1 = tableObj1.rows;
+//		if(rowsObj1.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_fees]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_fees']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS10'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS11'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS12'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS13'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS14'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS15'){
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS16'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove(); 
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS17'){
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove(); 
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS18'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS19'){
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove(); 
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS20'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove(); 
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS21'){
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove(); 
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS22'){
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//		//隐藏信用证中是否背对背
+//		$("#gdt_contractAmeLook_lcBill tr td:nth-child(11)").hide();
+//		$("#gdt_contractAmeLook_lcBill tr th:nth-child(11)").hide();
+//	}
+//	
+//	if(bussVariety == 'CLMS23'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS24'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS25'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		
+//		var tableObj = $('table[id=gdt_contractAmeLook_credit]')[0];
+//		var rowsObj = tableObj.rows;
+//		if(rowsObj.length == 2){
+//			$("div[id$='_credit']").remove();
+//		}
+//	}
+//	
+//	if(bussVariety == 'CLMS26'){
+//		$("div[id$='_lcBill']").remove();
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		$("div[id$='_credit']").remove();
+//	}
+//	
+//	if(bussVariety == 'CLMS27'){
+//		$("div[id$='_lgBill']").remove();
+//		$("div[id$='_accBill']").remove();
+//		$("div[id$='_bill']").remove();
+//		$("div[id$='_sdBill']").remove();
+//		$("div[id$='_amount']").remove();
+//		$("div[id$='_amountYt']").remove();
+//		$("div[id$='_fees']").remove();
+//		$("div[id$='_credit']").remove();
+//		//隐藏信用证中是否背对背
+//		$("#gdt_contractAmeLook_lcBill tr td:nth-child(11)").hide();
+//		$("#gdt_contractAmeLook_lcBill tr th:nth-child(11)").hide();
+//	}
+})
+
+//展示单据
+function showSDBillMsg(obj){
+	var tr = $(nstc.sf.findParent(obj,"TR"));
+	var wbId = tr.find("input[id$=.billId]").val();
+	var url = "BMMS@showSDDetail.sf?m=v&wbId=" + wbId;
+	openwin(url, '单据详情', 800, 500);
+}
+//显示单据上信用证详情
+function showLCbill(obj){
+	var tr = $(nstc.sf.findParent(obj,"TR"));
+	var wbId = tr.find("input[id$=.lcWbId]").val();
+	if(!wbId){
+		wbId = tr.find("input[id$=.billId]").val();
+	}
+	var url = "BMMS@showILCDetail.sf?m=v&wbId=" + wbId;
+	openwin(url, '信用证详情', 800, 500);
+}
+//显示合同
+function lookContract(obj){
+	var tr = nstc.sf.findParent(obj, 'tr');
+	var fmId = $(tr).find('input[id$=.fmId]').val();
+	var contractId = $(tr).find('input[id$=.contractId]').val();
+	var bussVariety = $(tr).find('input[id$=.bussVariety]').val();
+	doSelAmendment(bussVariety,fmId,contractId,"v");
+}

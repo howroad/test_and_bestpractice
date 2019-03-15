@@ -1,0 +1,138 @@
+//间接融资-贷款》承兑汇票
+$(function(obj){
+	/*var bussClass = $("select[id$=.bussClass]").val('CLMS02');*/
+	var bussClass = $("select[id$='.bussClass']").attr('value','CLMS02');
+	doChange(bussClass[0]);
+	//隐藏业务品种和分类,展示值
+	/*$("select[id$=.bussVariety]").val("CLMS10");*/
+	$("select[id$='.bussVariety']").attr('value',"CLMS10");
+	var bussVariety = $("select[id$=.bussVariety]");
+	var cltName = $("input[id$=.cltName]").val();
+	var apply = $("input[id$='_form.applyId']").val();
+
+	if(apply != undefined && apply != null && apply != ''){
+		doHidden(bussClass,bussVariety);
+	}
+	
+	var m = document.getElementById('m').value;
+	if(m=='e' || m == 'v' || m == ''){
+		doHidden(bussClass,bussVariety);
+	}
+	if(m=='e' || m=='a'){
+		initDraft();
+	}
+	if(m=='v'){
+		$('[id$="serch"]:visible').each(function(){
+			$(this).hide();
+		});
+	}
+	
+	var channel = $("input[id$='gdt_conAccbill_form.channel']").val();
+    //当channel字段不为GDEBIT时，将带入的数据置换为不可写
+	if(isNotNull(channel) && channel != "GDEBIT"){
+		var table = $("#gdt_conAccbill_info");
+		doReadOnly(table);
+	}
+});
+function initDraft() {
+	var apply = $("input[id$='_form.applyId']").val();
+	if(apply != undefined && apply != null && apply != ''){
+		var contractChannal = $('[id$="info.contractChannal"]').val();
+		var flag = '1' == contractChannal;
+		//隐藏文本
+		if(flag) {
+			//有票据系统时
+			//隐藏按钮
+			$('[id$="bill.add1"]').hide();
+			$('[id$="bill.del1"]').hide();
+			showAsText($('[id$="info.payBillWay"]'), 0);
+			showAsText($('[id$="info.amount"]'), 0, {"width":"100%","text-align":"right","font-weight":"bold"});
+		}
+		//单位名称、                                                 
+		showAsText($('[id$="info.cltName"]'), 0);
+		//票据介质、
+		showAsText($('[id$="info.billStyle"]'), 0);
+		//合作金融网点、
+		showAsText($('[id$="info.assBankName"]'), 0);
+		//出票人账号、
+		showAsText($('[id$="info.payNo"]'), 0);
+		var billNos = $('[id$="bill.billNo"]:visible');
+		for (var i =0; i<billNos.length;i++){
+			var tr = $(billNos[i]).parents('tr').first();
+			if(flag) {
+				//有票据系统时
+				showAsText(tr.find('[id$="bill.billNo"]'), tr.index());
+				showAsText(tr.find('[id$="bill.startDate"]'), tr.index(), {"width":"100%","text-align":"center"});
+				showAsText(tr.find('[id$="bill.endDate"]'), tr.index(), {"width":"100%","text-align":"center"});
+				showAsText(tr.find('[id$="bill.billAmount"]'), tr.index(), {"width":"100%","text-align":"right","font-weight":"bold"});
+				showAsText(tr.find('[id$="bill.isRediscount"]'), tr.index());
+			}
+			//是否对内开票、
+			showAsText(tr.find('[id$="bill.payRange"]'), tr.index());
+			//收款人名称、
+			showAsText(tr.find('[id$="bill.payee"]'), tr.index());
+			//收款人账号、
+			showAsText(tr.find('[id$="bill.recAccount"]'), tr.index());
+			//收款人开户行
+			showAsText(tr.find('[id$="bill.recBank"]'), tr.index());
+		}
+	}
+}
+//计算承兑手续费
+function calCost(obj) {
+	if ('gdt_conAccbill_info.feeRate' == $(obj).attr('id')){
+		checkRate(obj);
+	}
+	var amount = $('[id$="info.amount"]').val().replace(/[^\d|.]/g , '');
+	var feeRate = $('[id$="info.feeRate"]').val().replace(/[^\d|.]/g , '');
+	if (amount != '' && feeRate != ''){
+		var cost = parseFloat(amount)*parseFloat(feeRate)/parseFloat(100);
+		cost = FormatMoney(cost,2);
+		$('[id$="info.cost"]').val(cost);
+	}
+}
+//校验票号正确性
+function checkBlNo(obj){
+	var draftMedium = $("[id$='.billStyle']").val();
+	if ('' == draftMedium) {
+		alert("票据介质不能为空");
+		obj.value = '';
+	}
+	if('' == obj.value) return;
+	if("paper" == draftMedium){
+		if(obj.value.getStrLength() != 16){
+			alert("纸票必须是16位");
+			/*obj.focus();*/ //此聚焦方法在Chrome 70版本中会一直触发校验，导致其他操作无法进行
+			obj.value = '';
+		}
+	} else {
+		if(obj.value.getStrLength() != 30){
+			alert("电票必须是30位");
+			/*obj.focus();*/
+			obj.value = '';
+		}
+	}
+}
+function validateBill() {
+	var trs = $('table[id="gdt_conAccbill_bill"] tbody tr:visible');
+	for (var i = 0; i < trs.length; i++) {
+		var startDate = $(trs[i]).find('[id$=".startDate"]').val();
+		var endDate = $(trs[i]).find('[id$=".endDate"]').val();
+		if(startDate!='' && endDate!=''){
+			if(dateDiff(startDate,endDate) <= 0){
+				alert("到期日不能小于等于出票日期");
+				return false;
+			}
+		}
+	}
+	return true;
+}
+function validateOtherFees(obj) {
+	var otherFeesStr = obj.value;
+	var otherFees = parseFloat(otherFeesStr.replace("," , ''))
+	if(!validatePositiveNumber(otherFees)) {
+		alert("请输入正数！");
+		obj.value = "";
+		obj.focus();
+	}
+}

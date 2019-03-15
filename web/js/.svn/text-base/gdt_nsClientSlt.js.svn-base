@@ -1,0 +1,42 @@
+// 融资申请页面 --> 添加/查看/修改  --> 选择单位窗口
+//选择单位可以将数据带回
+function callback(obj) {
+	
+	var cltno = obj.innerHTML;
+	var tr = $(nstc.sf.findParent(obj, "TR"));
+	var cltname = tr.find("input[id$='.cltName']").val();
+	var treeNo = tr.find("input[id$='.treeNo']").val();
+	if (cltno == '清空数据') {
+		cltno = "";
+		cltname = "";
+		treeNo = "";
+	}
+	var result = {};
+	result.cltNo = cltno;
+	result.cltName = cltname;
+	result.treeNo = treeNo;
+	if ($("input[id$='_qry.wtClient']").val() == '1') {
+		result.wtClient = '1';
+	}
+	var isDelegate = $("input[id$='_qry.isDelegate']").val();
+	var limit = $("input[id$='_qry.limit']").val();
+	//瑞茂通客户化内容，回显事业部、部门
+	var nsType =$("input[id$='_qry.nsType']").val();
+	if(isDelegate != undefined && isDelegate != null && isDelegate != ''){
+		top.Layer.getWin().setDelegate(result);
+		windowClose();
+	}else if(limit=='1'){
+		top.Layer.getWin().setAllNsclient(result);
+		windowClose();
+	}else if(nsType=='6'){
+		top.Layer.getWin().setDivNsclient(result);
+		windowClose();
+	}else if(nsType=='7'){
+		top.Layer.getWin().setDepNsclient(result);
+		windowClose();
+	}
+	else{
+		top.Layer.getWin().setNsclient(result);
+		windowClose();
+	}
+}

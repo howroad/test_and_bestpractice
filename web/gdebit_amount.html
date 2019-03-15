@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="GBK">
+    <title>Title</title>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="chrome/jsH5/dynamicForm.js"></script>
+    <script src="js/common_page.js"></script>
+    <link rel="stylesheet" href="css/common_page.css" type="text/css" />
+</head>
+<body>
+<div>
+    <div class="DefaultTitleBar">
+        <span class="DefaultTitleBar-title">附件上传</span>
+        <input type="button" value="新增" name="gdt_con_amount.add" class="button26 button" onmouseover="smartForm_bt_onmouseover(this)" onmouseout="smartForm_bt_onmouseout(this)" onclick="addContractAmount(this)">
+        <input type="button" value="删除" class="button4 button" onmouseover="smartForm_bt_onmouseover(this)" onmouseout="smartForm_bt_onmouseout(this)">
+    </div>
+    <table id="gdt_con_amount" cellspacing="0" cellpadding="0" class="GridUnitTable" border="0" width="100%">
+        <thead>
+        <tr class="table_bg">
+            <th>
+                <input type="checkbox" id="gdt_con_amount._checks" name="gdt_con_amount._checks" class="checkbox" alt="el" onclick="smartForm_all_checkbox(this, 'gdt_con_amount._check')" onpropertychange="checkbox_propertyChange(this)">
+                <span class="checkbox_bg" onclick="click_checkbox(this)"></span>
+            </th>
+            <th><span class="red">*</span>币种</th>
+            <th><span class="red">*</span>金额</th>
+            <th><span class="red">*</span>利率调整方式</th>
+            <th><span class="red">*</span>利率调整频率</th>
+            <th><span class="red">*</span>利率调整首次生效日</th>
+            <th><span class="red">*</span>基准利率</th>
+            <th>利率类型</th>
+            <th>利率种类</th>
+            <th><span class="red">*</span>利率浮动方式</th>
+            <th><span class="red">*</span>年利率</th>
+            <th><span class="red">*</span>付息方式</th>
+            <th><span class="red">*</span>付息日期</th>
+            <th><span class="red">*</span>还本方式</th>
+            <th><span class="red">*</span>还本日期</th>
+
+        </tr>
+        </thead>
+        <tbody>
+            <tr id="tableCopy_gdt_con_amount" class="hidden">
+                <td>
+                    <input type="button" class="buttonX button32" onclick="nstc.sf.delCurrRow(this)">
+                </td>
+                <!--币种-->
+                <td>
+                    <select name="gdt_con_amount.currencyNo" id="gdt_con_amount.currencyNo">
+                        <option value="CNY">人民币</option>
+                        <option value="USD">美元</option>
+                    </select>
+                </td>
+                <!--金额-->
+                <td>
+                    <input type="text" class="input_num" id="gdt_con_amount.amount" name="gdt_con_amount.amount">
+                </td>
+                <!--利率调整方式-->
+                <td>
+                    <select name="gdt_con_amount.rateAdjustType" id="gdt_con_amount.rateAdjustType"></select>
+                </td>
+                <!--利率调整频率-->
+                <td>
+                    <span></span>
+                    <select name="gdt_con_amount.rateAdjustFrequency" id="gdt_con_amount.rateAdjustFrequency" class="hidden">
+
+                    </select>
+                </td>
+                <!--利率调整首次生效日-->
+                <td>
+                    <select name="gdt_con_amount.rateEffectiveDay" id="gdt_con_amount.rateEffectiveDay">
+
+                    </select>
+                    <input type="hidden" id="gdt_con_amount.rateEffectiveDate" name="gdt_con_amount.rateEffectiveDate">
+                </td>
+                <!--基准利率-->
+                <td>
+                    <input type="hidden" id="gdt_con_amount.baseRate" name="gdt_con_amount.baseRate">
+                    <input type="hidden" id="gdt_con_amount.isLiborFlag" name="gdt_con_amount.isLiborFlag">
+                </td>
+                <!--利率类型-->
+                <td>
+                    <select name="gdt_con_amount.isLibor" id="gdt_con_amount.isLibor"></select>
+                </td>
+                <!--利率种类-->
+                <td>
+                    <select name="gdt_con_amount.rateTermKind" id="gdt_con_amount.rateTermKind"></select>
+                </td>
+                <!--利率浮动方式-->
+                <td>
+                    <select name="gdt_con_amount.floatType" id="gdt_con_amount.floatType"></select>
+                    <input type="hidden" id="gdt_con_amount.floatValue" name="gdt_con_amount.floatValue">
+                </td>
+                <!--年利率-->
+                <td>
+                    <input type="text" id="gdt_con_amount.rate" name="gdt_con_amount.rate">
+                </td>
+                <!--付息方式-->
+                <td>
+                    <select name="gdt_con_amount.payInterestType" id="gdt_con_amount.payInterestType"></select>
+                    <input type="hidden" id="gdt_con_amount.payInterestTypeOther" name="gdt_con_amount.payInterestTypeOther">
+                </td>
+                <!--付息日期-->
+                <td>
+                    <select name="gdt_con_amount.payInterestDay" id="gdt_con_amount.payInterestDay"></select>
+                    <input type="hidden" id="gdt_con_amount.payInterestDate" name="gdt_con_amount.payInterestDate">
+                </td>
+                <!--还本方式-->
+                <td>
+                    <select name="gdt_con_amount.repaymentType" id="gdt_con_amount.repaymentType"></select>
+                    <input type="hidden" id="gdt_con_amount.repaymentFrequency" name="gdt_con_amount.repaymentFrequency">
+                </td>
+                <!--还本日期-->
+                <td>
+                    <select name="gdt_con_amount.repaymentDateType" id="gdt_con_amount.repaymentDateType"></select>
+                    <input type="hidden" id="gdt_con_amount.repaymentDate" name="gdt_con_amount.repaymentDate">
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+</body>
+</html>

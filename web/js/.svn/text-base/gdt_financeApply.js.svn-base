@@ -1,0 +1,148 @@
+//   融资申请页面 
+$(function (){
+	//动态显示授信品种
+	var bussClass= document.getElementById('gdt_financeApply_qry.bussClass');
+	var bussVariety= document.getElementById('gdt_financeApply_qry.bussVariety');
+	queryBussVares(bussClass,bussVariety);
+})
+
+
+// 查询操作
+function doQuery(obj){
+	var minAmount = $('input[id$=.minAmount]').val();
+	var maxAmount = $('input[id$=.maxAmount]').val();
+	var minDate = $('input[id$=.minDate]').val();
+	var maxDate = $('input[id$=.maxDate]').val();
+	if(!compareAmount(minAmount, maxAmount, '合同金额范围不合理')){
+		return;
+	} 
+	if(!compareDate(minDate, maxDate, '结束日范围不合理')){
+		return;
+	}
+	smartForm_doRefresh(obj)
+}
+
+
+// 选择单位
+function selectNsClient(){
+	var url = 'GDEBIT@gdt_nsClientSlt.sf';
+	openwin(url, '单位列表', 500, 400);
+}
+function setNsclient(obj){
+	$("input[id$=.cltNo]").val(obj.cltNo);
+	$("input[id$=.cltName]").val(obj.cltName);
+}
+
+// 查看融资申请操作
+function showFinanceApply(obj){
+	var tr = nstc.sf.findParent(obj, 'tr');
+	var applyId = $(tr).find('input[id$=.applyId]').val();
+	var bussVariety = $(tr).find('input[id$=.bussVariety]').val();
+	var url = getApplyUrl(bussVariety) + '?m=v&applyId=' + applyId+'&bussVariety='+bussVariety;
+	openwin(url, '融资申请详情', 1200, 600);
+}
+
+// 修改融资申请操作
+function modifyFinanceApply(obj){
+	var tr = nstc.sf.findParent(obj, 'tr');
+	var applyId = $(tr).find('input[id$=.applyId]').val();
+	var bussVariety = $(tr).find('input[id$=.bussVariety]').val();
+	var url = getApplyUrl(bussVariety) + '?m=e&applyId=' + applyId+'&bussVariety='+bussVariety;
+	openwin(url, '融资申请修改', 1200, 600);
+}
+
+// 添加按钮,弹出融资申请录入窗口
+function doAdd(){
+	var url = 'GDEBIT@gdt_financeApplyEntry.sf?m=a';
+	openwin(url, '融资申请录入', 1200, 600);
+}
+
+// 提交按钮,提交融资申请
+function doSubmit(obj){
+	var checkObj = $("[id$=._check]:visible");
+	var checkNum=getCheckNum();
+	if (checkNum == 0) {
+		alert("至少选择一条记录！");
+		return;
+	}
+	//add by ly start 
+	if(!checkGuaOnSubmit(checkObj)){
+		alert("担保信息不能为空！");
+		return;
+	}
+	//add by ly end
+	smartForm_doSave(obj);
+}
+//add by ly start 提交到工作流之前，校验担保是否占用，是否需要补录担保信息
+function checkGuaOnSubmit(obj){
+	var checkObj = new Array();
+	checkObj = obj;
+	var result = true;
+	for ( var i = 0; i < checkObj.length; i++) {
+		if (checkObj[i].checked) {
+			var tr = $(checkObj[i]).closest("tr");
+			var isTakeGuarantee = tr.find("[id$='isTakeGuarantee']").val();
+			if(isTakeGuarantee == 1){//1占担保 0不占
+				var applyId = tr.find("[id$='_list.applyId']").val();
+				$.ajax({
+					type: 'POST',
+					  url: "GDEBIT@CheckGuaranteeAmountBusiness.sf",
+					  async : false,
+					  data: {"applyId":applyId},
+					  success: function(data) {
+						 if(data != "true"){
+							 result = false;
+						 }
+					  }
+				});
+			}
+			if(result == false){
+				break;
+			}
+		}
+	}
+	return result;
+}
+//add by ly end 
+// 删除按钮, 删除融资申请
+function doDelete(obj){
+	var checkNum=getCheckNum();
+	if (checkNum == 0) {
+		alert("至少选择一条记录！");
+		return;
+	}
+	if(confirm("确认删除？")){
+		smartForm_doSave(obj);
+	}
+}
+
+// 获取选中的行
+function getCheckNum(){
+	var checkObj = $("[id$=._check]:visible");
+	var checkNum = 0;
+	for ( var i = 0; i < checkObj.length; i++) {
+		if (checkObj[i].checked) {
+			checkNum++;
+		}
+	}
+	return checkNum;
+}
+
+// 全选
+function checkAll(obj){
+	smartForm_all_checkbox(obj,'gdt_financeApply_list._check');
+	getCheckSize();
+}
+
+// 选择某一个
+function checkRec(obj){
+	nstc.sf.clickCheckbox(obj);
+	getCheckSize();
+}
+
+function getCheckSize(){
+	var selectRecords = $("[id$=selectRecords]").val();
+	var checkNum=getCheckNum();
+	var selectRecordsHtml  = '<input id="selectRecords" name="selectRecords" type="hidden" value="'+selectRecords+'"/>'
+	$("[id$=selectRecords]").parent().html("共计"+selectRecords+"笔，已选"+checkNum+"笔。"+selectRecordsHtml);
+}

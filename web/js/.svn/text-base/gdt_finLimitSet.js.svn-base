@@ -1,0 +1,51 @@
+$(function(){
+	var isSkip = $('input[id$=.isSkip]').val();
+	if(isSkip != ''){
+		return;
+	}
+	doChangeList();
+})
+/**
+ * 
+ */
+function doChangeList(){
+	var method = $('select[id$="controlMethod"]').val();
+	var  url = ""
+    if(method == '0'){
+    	url ="GDEBIT@gdt_finLimitSet.sf?m=v"
+    }
+	if(method =='1'){
+		url ="GDEBIT@gdt_limitByAmount.sf?m=v";
+	}
+	if(method =='2'){
+		url ="GDEBIT@gdt_limitByBuss.sf?m=v";
+	}
+	url = url+"&controlMethod="+method;
+	window.location = url;
+}
+
+function doChangeMethod(){
+	var method = $('select[id$="controlMethod"]').val(); 
+	if(!checkIsOccupy()){
+		window.location.reload();
+	}
+	doChangeList();
+}
+
+function checkIsOccupy(){
+	var hasOccupy='';
+	$.ajax({
+　　　　　　url: 'GDEBIT@GdebitCheckIsOccupy.sf',
+　　　　　　type: 'POST',
+　　　　　　success: function (data) { 
+	          hasOccupy = data;
+　　　　　　},
+　　　　　　//是否使用异步发送
+　　　　　　async: false
+	　　});
+	if(hasOccupy != 0){
+		alert("融资限额已经被占用，不能修改");
+		return false;
+	}
+	return true;
+}

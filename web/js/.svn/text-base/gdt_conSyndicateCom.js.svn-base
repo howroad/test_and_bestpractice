@@ -1,0 +1,129 @@
+//间接融资-贷款》银团（公共）
+$(function(){
+	//start后续要删除此段，有页面应用了此js报错
+	var pageCode = $("input[id='pageCode']").val();
+	if (pageCode == 'gdt_addGdebitFetchApply'
+		|| pageCode == 'gdt_addFetchMoneyReg') {
+		return;
+	}
+	//end后续要删除此段，有页面应用了此js报错
+	
+	countOccupyProportion('', '1');
+})
+//计算占比
+function countOccupyProportion (obj, showFlag) {
+	//查询汇率
+	queryAllExchangeRate();
+	
+	var flag = true;
+	var amountList = $("input[id$='amount']");
+	var totalAmount = 0.00;
+	for (var i = 0; i < amountList.length; i++) {
+		var tr = amountList.eq(i).parents("tr").first();
+		if (showFlag != '1') {
+			setInfo4InputAndSpan(tr, 'occupyProportion', '', '');
+		}
+		var amount = amountList.eq(i).val();//合同金额
+		var exchangeRate = tr.find("input[id$='exchangeRate']").val();//汇率
+		if (exchangeRate == null || amount == '' || exchangeRate == '') {
+			continue;
+			//flag = false;
+		} else {
+			amount = amount.excludeNotNumericDot();//合同金
+			exchangeRate = exchangeRate.excludeNotNumericDot();//汇率
+			totalAmount = accadd(totalAmount, accMul(amount, exchangeRate));
+		}
+	}
+	
+	//融资合同金额：*******元
+	var toltalAmountObj = $("input[id$='_amount.totalAmount']");
+	toltalAmountObj.parent().html("融资合同金额：" + FormatMoney(totalAmount, 2) +"元").append(toltalAmountObj);
+	
+	if (showFlag == '1') {
+		return;
+	}
+	
+	//计算占比
+	var leftOccupyProportion = 1.00;//剩余占比
+	for (var i = 0; i < amountList.length; i++) {
+		var tr = amountList.eq(i).parents("tr").first();
+		var amount = amountList.eq(i).val();
+		var exchangeRate = tr.find("input[id$='exchangeRate']").val();//汇率
+		
+		if (i == amountList.length - 1) {//最后一条数据
+			setInfo4InputAndSpan(tr, 'occupyProportion', 
+					leftOccupyProportion * 100, FormatMoney(leftOccupyProportion*100, 2));
+		} else {
+			if (amount == '' || exchangeRate == '') {
+				continue;
+			}
+			amount = amount.excludeNotNumericDot();
+			exchangeRate = exchangeRate.excludeNotNumericDot();//汇率
+			//计算占比
+			var occupyProportion = accDiv(accMul(amount, exchangeRate), totalAmount).toFixed(4);
+			setInfo4InputAndSpan(tr, 'occupyProportion', 
+					occupyProportion * 100, FormatMoney(occupyProportion * 100, 2));
+			//剩余占比
+			leftOccupyProportion = FloatSub(leftOccupyProportion, occupyProportion);
+		}
+	}
+}
+
+//查询汇率（所有）
+function queryAllExchangeRate () {
+	//校验币种是否相同
+	var currencyNoIsSame = true;
+	var currencyNo_t = '';
+	var amountList = $("input[id$='amount']:visible");
+	for (var i = 0; i < amountList.length; i++) {
+		var tr = amountList.eq(i).parents("tr").first();
+		var currencyNo = tr.find("[id$='.currencyNo']").val();
+		if (i == 0) {
+			currencyNo_t = currencyNo;
+		}
+		if (currencyNo_t != currencyNo) {
+			currencyNoIsSame = false;
+		}
+	}
+	
+	var exchangeRate = 1;//汇率
+	if (currencyNoIsSame) {//如果币种相同，默认汇率是1
+		exchangeRate = 1;
+		$("input[id$='exchangeRate']").val(exchangeRate)
+	} else {
+		$("input[id$='amount']:visible").each(function(){
+			setExchangeRate(this);
+		});
+	}
+}
+
+//查询汇率（单条）
+function setExchangeRate(obj) {
+	var tr = $(obj).parents("tr").first();
+	var startDate = $("input[id$='startDate']").val();//开始日
+	var currencyNo = tr.find("[id$='currencyNo']").val();//币种
+	var exchangeRateObj = tr.find("input[id$='exchangeRate']");//汇率
+	exchangeRateObj.val('');
+	if (startDate == '' || currencyNo == '') {
+		return;
+	}
+	
+	//查询汇率
+	var exchangeRate = '';
+	if (currencyNo == 'CNY') {
+		exchangeRate = 1;
+	} else {
+		exchangeRate = queryExchangeRate(currencyNo, 'CNY', startDate);
+		if (exchangeRate == '') {//汇率为空，反过来查询
+			exchangeRate = queryExchangeRate('CNY', currencyNo, startDate);
+			if (exchangeRate != '') {
+				exchangeRate = accDiv(1, exchangeRate).toFixed(6);
+			}
+		}
+		if (exchangeRate == '') {
+			exchangeRate = 1;
+			//alert("请先维护在" + startDate + "日之前生效的" + currencyName + "兑人民币的汇率");
+		}
+	}
+	exchangeRateObj.val(exchangeRate);
+}

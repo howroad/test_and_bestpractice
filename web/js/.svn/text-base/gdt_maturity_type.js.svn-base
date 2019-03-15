@@ -1,0 +1,75 @@
+
+var swidth = window.screen.width;
+var sheight = window.screen.height;
+function getmatchart(obj){
+
+	var leg=null;
+	var date=$("[id$='date']").val();
+	if(date==null&&date==""){
+		alert('请选择正确的日期！');
+	}else{
+	
+	$.ajax({
+		type : 'POST',
+		url : "GDEBIT@AjaxDebtMaturity.sf",
+		async : false,
+		data : {
+			"date" : date
+		},
+		dataType : "json",
+		success : function(da) {
+			leg=da[0];
+		}
+	});
+	
+	// add一个图形的div
+	var div = document.getElementById('gdt_debt_maturity_chart.content');
+	div.innerHTML = '<div style="border-width:1px 1px 0 1px;border-color:#C8C8C8;border-style:solid;height:40px;">'
+
+	+'<div style="border-width:0 1px 1px 1px;border-color:#C8C8C8;border-style:solid;height:700px">'
+	+'<div id="mainPie" style="width:'+swidth*0.42+'px;height:400px;">'
+	+'</div>'
+	+'</div>';
+
+	var option = {
+		    title : {
+		        text: '债务期限',
+		        x:'center'
+		    },
+		    tooltip : {
+		        trigger: 'item',
+		        formatter: function(params) {
+		        	var res = params.seriesName+'<br/>';
+		        	res+=params.name+':'+params.value+'('+params.percent.toFixed(2)+'%)';
+		        	return res;
+		        }
+		    },
+		    legend: {
+		        orient: 'vertical',
+		        left: 'left',
+		        data: [leg.oneYear,leg.fiveYear,leg.otherYear]
+		    },
+		    series : [
+		        {
+		            name: '金额单位：元',
+		            type: 'pie',
+		            radius : '55%',
+		            center: ['50%', '60%'],
+		            data:[{value:leg.oneValue,name:leg.oneYear},
+		                  {value:leg.fiveValue,name:leg.fiveYear},
+		                  {value:leg.otherValue,name:leg.otherYear}
+		            ],
+		            itemStyle: {
+		                emphasis: {
+		                    shadowBlur: 10,
+		                    shadowOffsetX: 0,
+		                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+		                }
+		            }
+		        }
+		    ]
+		};
+	var myPieChart = echarts.init(document.getElementById('mainPie'));
+	myPieChart.setOption(option);
+	}
+}

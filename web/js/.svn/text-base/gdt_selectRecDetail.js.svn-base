@@ -1,0 +1,35 @@
+function doRefresh(obj){
+	var minAmount = $('input[id$=.minAmount]').val();
+	var maxAmount = $('input[id$=.maxAmount]').val();
+	var minDate = $('input[id$=.minDate]').val();
+	var maxDate = $('input[id$=.maxDate]').val();
+	if(!compareAmount(minAmount, maxAmount, '合同金额范围不合理')){
+		return;
+	} 
+	if(!compareDate(minDate, maxDate, '日期范围不合理')){
+		return;
+	} 
+	smartForm_doRefresh(obj)
+}
+function callBack(obj){
+	var bkId=$(obj).html();
+	var tr=$(obj).parents('tr').first();
+	var recId=tr.find('[id$="recId"]').val();
+	var curCode=tr.find('[id$="curCode"]').val();
+	var lsh=tr.find('[id$="lsh"]').val();
+	var associateBankName=tr.find('[id$="associateBankName"]').val();
+	var recDate=tr.find('[id$="recDate"]').val();
+	var attrAmount=tr.find('[id$="attrAmount"]').val();
+	var recordId=tr.find('[id$="recId"]').val();
+	var result={};
+	result.bkId=bkId;
+	result.recId=recId;
+	result.curCode=curCode;
+	result.lsh=lsh;
+	result.associateBankName=associateBankName;
+	result.recDate=recDate;
+	result.attrAmount=attrAmount;
+	result.recordId=recordId;
+	top.Layer.getWin().setRecDetail(result);
+	windowClose();
+}

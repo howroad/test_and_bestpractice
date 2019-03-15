@@ -1,0 +1,601 @@
+*,BODY{font-family: "宋体", "Arial", "Helvetica";font-size: 12px;margin:0px; padding:0px;}
+INPUT,TEXTAREA,SELECT,SPAN,LABEL{
+    vertical-align: middle;
+}
+.PAGE_BODY { background:transparent;margin:2px;}
+.BODY_SCR_AUTO { background:transparent;margin:2px;overflow:auto;}
+.BODY_SCR_HIDDEN { background:transparent;margin:2px;overflow:hidden;}
+/*class引用示例*/
+th           class="table_bg th_width_120 text-right"
+td           class="table_bg text-center"
+text         class="text control w60 table_height"
+textarea     class="text textarea control textarea_h_100"
+select		 class="w60"
+checkbox     class="checkbox"
+radio  	     class="radio"
+DateText     class="DateText table_height control"/*日期*/
+moneyText    class="moneyText table_height control text-right"/*金额*/
+READONLY     class="READONLY "
+DISABLED     class="DISABLED "
+RATE         class="moneyText table_height control text-right"/*利息*/
+
+button       class="button2 button"
+onMouseOver="this.className='button2 button button2_Over'"
+onMouseOut="this.className='button2 button'"
+
+
+/*默认连接样式*/
+a:visited { color: #055A58;}
+a:active {color: #055A58;}
+a:hover {color: #7CB2B2;}
+a {color: #055A58;cursor:hand;}
+
+/*可选控件宽度*/
+.w100 {width:100%;}
+.w95 {width:95%;}
+.w90 {width:90%;}
+.w80 {width:80%;}
+.w70 {width:70%;}
+.w60 {width:100%;}
+.w50 {width:50%;}
+.w40 {width:40%;}
+.w30 {width:30%;}
+.w20 {width:20%;}
+.w10 {width:10%;}
+
+.w_fixed5{width:5px;}/*固定宽度5像素*/
+.h100 {height:100%;}
+
+.hidden{display:none}
+.hand{cursor: pointer;}
+
+
+/*控件样式*/
+.text,.textarea,.checkbox,.DateText,.moneyText,.READONLY,.DISABLED,.RATE{border:1px solid #808080;/*共享边框*/}
+.CHECKBOX,.RADIO {border: 0px;vertical-align: middle;}
+.READONLY,.DISABLED{background-color: #DFDFDF;}/*只读/禁止背景*/
+.DateText {}/*日期宽度*/
+.moneyText {}/*金额宽度*/
+.control {background-color: #FFFFFF;} /*控件背景*/
+
+/*页面table样式*/
+.fixedtable{
+	table-layout: fixed; 
+	height: 99%;
+}
+.fixedtable .QueryUnitTableTD,.fixedtable .FormUnitTableTD{
+		height:1%;
+		vertical-align:top;
+}
+
+.fixedtable .GridUnit_toolbar,.fixedtable  .GridUnit_bottom{
+	height:28px;
+}
+
+.fixedtable .unit_content_list{
+	height:100%;
+	width:100%;
+	overflow-x:auto;
+	border-left:1px solid #C8C8C8;	
+	border-right:1px solid #C8C8C8;	
+	border-bottom:1px solid #C8C8C8;	
+}
+.fixedtable .GridUnitOuterTable{
+	height:100%;
+	width:100%;
+	table-layout: fixed;
+}
+
+
+/*body下最外层框架样式，由于历史原因，老版blue、blue0、green三种样式页面宽度不宜100%，左右需要留有一定空白宽度，因此通过本样式解决*/
+.pagecenter{
+}
+/*页面导航table的样式*/
+.pagenavigation{
+	width:100%;
+	border-top: 0px solid silver;
+	border-bottom: 0px solid silver;
+	border-left: 0px solid silver;
+	border-right: 0px solid silver;
+}
+/*导航内容样式*/
+.pagenavigation_content{
+	font-family:verdana;
+	COLOR:#336600;
+	font-size:15px;
+	font-weight:bold;
+}
+/*导航分割线样式*/
+.pagenavigation_line{
+	height: 1px; 
+	color:#308040;
+}
+/*textarea 默认宽度/高度*/
+.textarea { width:100%; height:100%;}
+.textarea_h_100 {height:100px}
+.textarea_h_200 {height:200px}
+.textarea_h_300 {height:300px}
+.textarea_h_400 {height:400px}
+.textarea_h_500 {height:500px}
+.textarea_h_600 {height:600px}
+
+/*列表头/列表头高度*/
+.table_height{ height: 22px; line-height:22px}
+/*合计行样式*/
+.table_total{background-color: #DAEDC0;}
+/*小计行样式*/
+.table_sub_total{background-color: #F0FEDF;}
+
+/*字体位置*/
+.text-center {text-align: center; vertical-align: middle;}
+.text-right {text-align: right;padding-right:5px;}
+.text-left {text-align: left;padding-left:5px;}
+
+/*表头/列表头背景*/
+.table_bg { background:url(../img/tab_14.gif) repeat-x; background-color:#E3FCC2; }
+
+/*列表基本属性*/
+th{
+	padding: 2px;
+	border-left: 1px solid silver;
+	border-top: 1px solid silver;
+	font-weight:normal;
+	height: 25px;
+}
+
+/*列表宽度*/
+.th_width_120 {width:1%; white-space:nowrap; padding-left:30px;}
+.th_width_150 {width:*; white-space:nowrap;}
+.th_width_180 {width:180px;}
+
+/*各单元默认顶部工具栏*/
+.DefaultTitleBar { 
+	background-color: #D0EFD1;
+	font-weight:bold;
+	height:28px;
+	line-height:24px;
+	border-left:1px solid #C8C8C8;
+	border-right:1px solid #C8C8C8; 	
+	border-top:1px solid #C8C8C8;
+	border-bottom: 0px solid #C8C8C8;
+	padding-left:25px; 
+	padding-top:0px;
+}
+
+/*查询单元没有内容情况，补齐边框*/
+.boder_line .QueryUnitTableTD .DefaultTopToolBar { 
+	border-bottom:1px solid #C8C8C8;
+}
+
+/*查询单元没有内容情况，补齐边框*/
+.boder_line .QueryUnitTableTD .DefaultBottomToolBar { 
+	border-top:1px solid #C8C8C8;
+}
+.DefaultTopToolBar { 	
+	text-align:right; 
+	padding-right:10px; 
+	height:28px;
+	line-height:24px; 
+	border-left: 1px solid #C8C8C8; 
+	border-right:1px solid #C8C8C8;
+	border-bottom:0px solid #FFF5F4;
+	border-top:1px solid #C8C8C8;
+}
+.DefaultTopToolBar  TD{ 
+}
+/*各单元默认底部工具栏*/
+.DefaultBottomToolBar { 
+	text-align:right; 
+	padding-right:24px; 
+	height:28px;
+	line-height:24px; 
+	border-left: 1px solid #C8C8C8;
+	border-right:1px solid #C8C8C8;
+	border-bottom:1px solid #C8C8C8;
+	border-top:0px solid #FFF5F4;
+}
+/*查询单元底部工具栏*/
+.QueryBottomToolBar{
+	text-align:right; 
+	padding-right:10px; 
+	height:28px;
+	line-height:24px; 
+	border-left: 1px solid #C8C8C8;
+	border-right:1px solid #C8C8C8;
+	border-bottom:1px solid #C8C8C8;
+	border-top:0px solid #FFF5F4;
+}
+/*列表单元外围表格，用于固定table布局*/
+.GridUnitOuterTable{
+	height:100%;
+	width:100%;
+}
+
+.FIXHEAD .GridUnitOuterTable,.FIXCOL  .GridUnitOuterTable{
+	height:100%;
+	width:100%;
+	border-bottom:1px solid #C8C8C8;
+	table-layout: fixed;
+}
+.FIXHEAD  .unit_content_list,.FIXCOL  .unit_content_list{
+	height:100%;
+	width:100%;
+	overflow-x:auto;
+	border-left:0px solid #C8C8C8;	
+	border-right:0px solid #C8C8C8;	
+	border-bottom:0px solid #C8C8C8;	
+}
+
+.FIXHEAD .GridUnitTable,.FIXCOL .GridUnitTable  {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: -1px;
+	border-bottom: 1px solid #C8C8C8;
+	border-top:  px solid #C8C8C8;
+	border-left:   1px solid #C8C8C8;
+	border-right:  1px solid #C8C8C8;
+	empty-cells: show;
+	border-collapse: separate !important;
+	border-collapse: collapse;
+	background-color:white;
+}
+.FIXHEAD .DefaultBottomToolBar, .FIXCOL .DefaultBottomToolBar { 
+	text-align:right; 
+	padding-right:24px; 
+	height:28px;
+	line-height:24px; 
+	background: #FFE0C1;
+	border-left: 1px solid #C8C8C8;
+	border-right:1px solid #C8C8C8;
+	border-bottom:0px solid #FFF5F4;
+	border-top:1px solid #C8C8C8;
+}
+
+.GridUnit_title{
+	height:28px;
+}
+.GridUnit_toolbar{
+}
+.GridUnit_bottom{
+}
+.unit_content_list{
+	height:100%;
+	width:100%;
+}
+.unit_content_list_fix_left{
+	height:100%;
+	width:100%;
+	overflow-x:auto;
+	border-left:1px solid #C8C8C8;	
+	border-right:1px solid #C8C8C8;	
+	border-bottom:0px solid #C8C8C8;	
+}
+
+.unit_content_list_fix_right{
+	height:100%;
+	width:100%;
+	border-left:0px solid #C8C8C8;	
+	border-right:1px solid #C8C8C8;	
+	border-bottom:0px solid #C8C8C8;	
+	overflow:hidden;
+}
+.GridLeftTitle{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	z-index:200;
+	overflow-x:hidden;
+	display:none;
+	cursor:hand;
+}
+.GridLeftData{
+	position:absolute;
+	top:0px;
+	left:0px;
+	height:100%;
+	overflow-x:scroll;
+	overflow-y:hidden;
+	width:100%;
+	z-index:10;
+}
+.GridLeftData_table{
+	table-layout:fixed;
+}
+.GridRightTitle{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	z-index:200;
+	overflow-x:hidden;
+	display:none;
+}
+.GridRightData{
+	position:absolute;
+	top:0px;
+	left:0px;
+	height:100%;
+	overflow-x:scroll;
+	overflow-y:auto;
+	width:100%;
+	z-index:10;
+}
+
+/*列表单元基本属性*/	
+.GridUnitTable {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	border-bottom: 1px solid silver;
+	border-right: 1px solid silver;
+	border-top: 1px solid silver;
+	empty-cells: show;
+	border-collapse: separate !important;
+	border-collapse: collapse;
+	background-color:white;
+}
+
+/*列表基本属性*/
+.GridUnitTable TD {
+	height: 22px;
+	border-left: 1px solid silver;
+	border-top: 1px solid silver;
+	padding: 1px;
+}
+
+/*存放整个列表单元的页面框架TD样式*/
+.GridUnitTableTD{}
+/*存放整个普通表单单元的页面框架div样式，被GridUnitTableTD包含*/
+.GridUnitDiv{
+}
+
+/*列表单元行间隔样式、选中样式、鼠标覆盖行样式*/
+.rowCss1{background-color:#F3F3F3;}
+.rowCss2{background-color:#fff;}
+.rowSelected{background-color:#F4DCDF;}
+.rowOver{background-color:#F8E8EA;}
+
+/*细线表格*/	
+.FormUnitTable {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	empty-cells: show;
+	border-top: 1px solid silver;
+	border-right: 1px solid silver;
+	border-bottom: 1px solid silver;
+	border-collapse: separate !important;
+	border-collapse: collapse;
+	background-color:white;
+}
+
+/*列表基本属性*/
+.FormUnitTable TD {
+	height: 22px;
+	border-left: 1px solid silver;
+	border-top: 1px solid silver;
+	padding: 1px;
+}
+
+/*存放整个普通表单单元的页面框架TD样式*/
+.FormUnitTableTD{
+}
+/*存放整个普通表单单元的页面框架div样式，被FormUnitTableTD包含*/
+.FormUnitDiv{}
+.autoHeight{
+	height:100%;
+}
+
+.autoHeight .FormUnitDiv{
+	height:100%;
+}
+.autoHeight .FormUnitTable{
+	height:100%;
+}
+.autoHeight .unit_content{
+	
+}
+.autoHeight2 .FormUnitTableTD{
+	height:100%;
+}
+
+.autoWrap{
+    word-wrap:break-word;
+}
+
+/*查询单元Table属性*/	
+.QueryUnitTable {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	border-top: 1px solid silver;
+	border-bottom: 1px solid silver;
+	border-left: 1px solid silver;
+	border-right: 1px solid silver;
+
+	empty-cells: show;
+	border-collapse: separate !important;
+	border-collapse: collapse;
+	background-color:white;
+}
+
+/*单元内容区域使用标题栏背景（使用场景：无标题栏，只有内容区域）*/
+.UnitTable_ToolBarBg{
+	background: #FFF5F4;
+}
+
+/*列表基本属性*/
+.QueryUnitTable TD {
+	height: 22px;
+	border-left: 0px solid silver;
+	border-top: 0px solid silver;
+	padding: 1px;
+}
+
+/*存放整个查询单元的页面框架TD样式*/
+.QueryUnitTableTD {
+}
+/*存放整个查询单元的页面框架div样式，被QueryUnitTableTD包含*/
+.QueryUnitDiv {}
+
+/*无边框*/
+.noBorder TD {border: none;}
+
+/*input 按钮*/
+.button{width:53px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+
+/*普通按钮*/
+.buttonDef {font-family: "宋体"; font-size: 12px;height:22px; background:url(../img/button_bg2.png) repeat-x left top; border:1px solid #DEDEDE;cursor:hand;}
+.buttonDef_Over {font-family: "宋体"; font-size: 12px;height:22px; background:url(../img/button_bg2.png) repeat-x left -22px; border:1px solid #DEDEDE;cursor:hand;}
+
+/*保存*/
+.button2 {background:url(../img/01_01.png) no-repeat left top ; margin-right:5px;}/*input 按钮*/
+.button2_Over {background-position: left -22px;cursor:hand;}
+
+/*重置/关闭*/
+.button3 {background:url(../img/01_27.png) no-repeat left top; margin-right:5px;}
+.button3_Over {background-position: left -22px;cursor:hand;}
+
+/*删除*/
+.button4 {background:url(../img/01_03.png) no-repeat left top; margin-right:5px;}
+.button4_Over {background-position: left -22px;cursor:hand;}
+
+/*提交*/
+.button12 {background:url(../img/01_11.png) no-repeat left top; margin-right:5px;}
+.button12_Over {background-position: left -22px;cursor:hand;}
+
+/*驳回*/
+.button24 {background:url(../img/01_24.png) no-repeat left top; margin-right:5px;}
+.button24_Over {background-position: left -22px;cursor:hand;}
+
+/*复核*/
+.button25 {background:url(../img/01_25.png) no-repeat left top; margin-right:5px;}
+.button25_Over {background-position: left -22px;cursor:hand;}
+
+/*新增*/
+.button26 {background:url(../img/01_09.png) no-repeat left top; margin-right:5px;}
+.button26_Over {background-position: left -22px;cursor:hand;}
+
+/*增加附件*/
+.button27 { width:76px; background:url(../img/01_07.png) no-repeat left top; margin-right:5px;}
+.button27_Over {background-position: left -22px;cursor:hand;}
+
+/*导出*/
+.button28 {background:url(../img/01_30.png) no-repeat left top; margin-right:5px;}
+.button28_Over {background-position: left -22px;cursor:hand;}
+
+/*关闭*/
+.button29 {background:url(../img/01_31.png) no-repeat left top; margin-right:5px;}
+.button29_Over {background-position: left -22px;cursor:hand;}
+
+/*导入*/
+.button30 {background:url(../img/01_32.png) no-repeat left top; margin-right:5px;}
+.button30_Over {background-position: left -22px;cursor:hand;}
+
+/*刷新*/
+.button31 { background:url(../img/01_29.png) no-repeat left top; margin-right:5px;}
+.button31_Over {background-position: left -22px;cursor:hand;}
+
+/*"X"型删除*/
+.buttonX{width:22px;height:22px;color:#494949;border:0px;cursor:hand;}
+.button32 {background:url(../img/01_40.png) no-repeat left top;}
+.button32_Over {background-position: left -22px;}
+
+/*打印*/
+.button34 { background:url(../img/01_34.png) no-repeat left top; margin-right:5px;}
+.button34_Over {background-position: left -22px;cursor:hand;}
+
+/*扩展支持四个字符*/
+.button21 { background:url(../img/01_21.png) no-repeat left top; margin-right:5px;}
+.button21_Over {background-position: left -22px;cursor:hand;}
+
+/*制定样式*/
+.buttonD2 { background:url(../img/bt_2.png) no-repeat left top; margin-right:5px;width:64px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+.buttonD2_Over {background-position: left -22px;cursor:hand;}
+
+/*制定样式*/
+.buttonD3 { background:url(../img/bt_3.png) no-repeat left top; margin-right:5px;width:74px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+.buttonD3_Over {background-position: left -22px;cursor:hand;}
+/*制定样式*/
+.buttonD4 { background:url(../img/bt_4.png) no-repeat left top; margin-right:5px;width:84px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+.buttonD4_Over {background-position: left -22px;cursor:hand;}
+/*制定样式*/
+.buttonD5 { background:url(../img/bt_5.png) no-repeat left top; margin-right:5px;width:94px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+.buttonD5_Over {background-position: left -22px;cursor:hand;}
+/*制定样式*/
+.buttonD6 { background:url(../img/bt_6.png) no-repeat left top; margin-right:5px;width:104px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+.buttonD6_Over {background-position: left -22px;cursor:hand;}
+/*制定样式*/
+.buttonD7 { background:url(../img/bt_7.png) no-repeat left top; margin-right:5px;width:114px;height:22px;padding:2px 0px 0px 15px;color:#494949;border:0px;cursor:hand;}
+.buttonD7_Over {background-position: left -22px;cursor:hand;}
+
+.border_B { border-top:1px solid #E0E0E0}
+.td_bg {}
+
+/*浏览*/
+.fl{ float:left;}
+.clear{clear:both;}
+.inputFile-txt{ width:280px; padding-left:5px; padding-right:5px;}
+.fileInput{background:url(../img/01_33.png) no-repeat left top; width:53px; height:22px; overflow:hidden;position:relative; margin-left:5px; margin-right:5px;}
+.fileInput_over{background-position: left -22px;}
+.upfile{
+	position:absolute;
+	top:36px;
+	left: -41px;
+}
+.upFileBtn{width:53px; height:22px; opacity:0;filter:alpha(opacity=0);cursor:pointer;}
+
+/* 页签分组CSS */
+.tabContainer{width:100%;overflow:hidden;}
+.tabContainer li{float:left;margin-right:2px;background:url(../images/tabOff_right.gif) no-repeat right top;}
+.tabContainer li span{display:block!important;display:inline-block;padding-top:2px;padding-left:15px;padding-right:15px;height:18px;line-height:18px;background:url(../images/tabOff_left.gif) no-repeat left top;}
+.webwidget_scroller_tab{font-size: 12px; font-family:Verdana, Geneva, sans-serif}
+.webwidget_scroller_tab .tabHead li span{font-weight: none;text-decoration: none;color: #000;}
+.webwidget_scroller_tab .tabContainer li.currentBtn{background:url(../images/tabOn_right.gif) no-repeat right top;}
+.webwidget_scroller_tab .tabContainer li.currentBtn span{height:18px;background:url(../images/tabOn_left.gif) no-repeat left top;color:#434142;}
+.webwidget_scroller_tab .tabContainer li.noBtn{background:url(../images/tabOff_right.gif) no-repeat right top;}
+.webwidget_scroller_tab .tabContainer li.noBtn span{height:18px;background:url(../images/tabOff_left.gif) no-repeat left top;color:#434142;}
+
+/*选窗CSS*/
+.Wfind{background:#fff url(../img/Wfind.png) no-repeat right;cursor: hand;}
+
+/* MultiDropCheckBox元素CSS*/
+.MultiDropCheckBoxRootDIV{}
+.MultiDropCheckBoxDIV{position:absolute;background:#FFF;border:1 solid #7F9DB9;overflow:auto;display:none;z-index:200; }
+.MultiDropCheckBoxSubDIV{height:20px;font-size:12px}
+.MultiDropINPUT{width:80%;height:100%;border:none;float:left}
+.MultiDropIMG{width:*;cursor:hand;float:right}
+.MultiDropSelect{height:20px;border:1px solid #7F9DB9;background:#FFF}
+
+/* DropFilterTable元素CSS*/
+.DropFilterTableDIV{position:absolute;background:#FFF;border:1 solid #7F9DB9;overflow:auto;display:none;z-index:201; }
+.DropFilterTableSubDIV{height:20px;font-size:12px}
+.DropFilterTableINPUT{width:80%;height:100%;border:none;float:left;cursor:hand;}
+.DropFilterTableIMG{width:*;cursor:hand;float:right}
+.DropFilterTableROW{cursor: pointer;}
+.DropFilterTableSelect{height:20px;border:1px solid #7F9DB9;background:#FFF}
+
+/* DropTree元素CSS*/
+.DropTreeDIV{position:absolute;background:#FFF;border:1 solid #7F9DB9;overflow:auto;display:none;z-index:202; }
+.DropTreeSubDIV{height:20px;font-size:12px}
+.DropTreeINPUT{width:80%;height:100%;border:none;float:left;cursor:hand;}
+.DropTreeIMG{width:*;cursor:hand;float:right}
+.DropTreeSelect{height:20px;border:1px solid #7F9DB9;background:#FFF}
+
+/* DropTextTable元素CSS*/
+.DropTextTableDIV{position:absolute;background:#FFF;border:1 solid #7F9DB9;overflow:auto;display:none;z-index:201; }
+.DropFilterTableSubDIV{height:20px;font-size:12px}
+.DropTextTableINPUT{width:80%;height:100%;border:none;float:left;cursor:hand;}
+.DropTextTableIMG{width:*;cursor:hand;float:right}
+.DropTextTableROW{cursor: pointer;}
+.DropTextTableSelect{height:20px;border:0px solid #7F9DB9;background:#FFF}
+
+/*弹出窗口清空超链接样式*/
+.pop_win_a{
+    text-decoration:none;
+    height: 22px;
+    line-height: 22px;
+}
+/*截取多余字符，以...填充*/
+.auto_ellipsis{
+	white-space:nowrap; word-break:keep-all; overflow:hidden; text-overflow:ellipsis;
+}
+

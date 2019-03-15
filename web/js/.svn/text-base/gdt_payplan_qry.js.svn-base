@@ -1,0 +1,61 @@
+$(function(){
+	/*var toDay = new Date();
+	var todate=parseInt(toDay.getDate());
+	var tomonth=parseInt(toDay.getMonth()+2);//指向下一个月
+	var toyear=parseInt(toDay.getFullYear());
+	
+	var $maxDate = $("input[id$='_qry.maxDate']");
+	if($maxDate.val() == ''){
+		$maxDate.val(toyear+"-"+tomonth+"-"+todate);
+	}*/
+	
+	var $countValue = $("input[id$='_list.countValue']");
+	$countValue.parent().css("color","red");
+	var $countTitle = $("input[id$='_list.countTitle']");
+	var addTR = "<tr><td style='font-weight: bold;'>"+$countTitle.val()+"</td><td colspan='8' style='color:red'>"+$countValue.val()+"</td></tr>";
+	$('table[id="gdt_staticsPayplan_list"]').append(addTR);
+	
+		//金额单位
+	var unit = $("select[id='gdt_staticsPayplan_list.amountD']");
+	var moneyUnit = $("input[id='gdt_staticsPayplan_qry.moneyUnit']").val();
+	if (moneyUnit != '') {
+		unit.val(moneyUnit);
+	}
+		$("span[id$='total']").html($("[id$='countTip']").val());
+});
+
+
+//查询操作
+function doQuery(obj){
+	var minEndDate = $('input[id$=.minDate]').val();
+	var maxEndDate = $('input[id$=.maxDate]').val();
+//	if(minEndDate=='' || maxEndDate==''){
+//		alert("统计期间不能为空");
+//		return;
+//	}
+	if(!compareDate(minEndDate, maxEndDate, '统计期间范围不合理')){
+		return;
+	} 
+	smartForm_doRefresh(obj)
+}
+//选择金融合作网点
+function selectAssBank(){
+	var url = "GDEBIT@gdt_associateBankSlt.sf";
+	openwin(url, '金融合作网点列表', 900, 500);
+}
+
+//选择 -- 金融合作网点
+function setAssBank(obj){
+	var assBankId= obj.assBankId;
+	var assBankName= obj.assBankName;
+	$("input[id$='_qry.assBankName']").val(assBankName);
+	$("input[id$='_qry.assBankId']").val(assBankId);
+}
+
+function setAmountByUnit(obj) {
+	var unit = obj.value;
+	$("input[id='gdt_staticsPayplan_qry.moneyUnit']").val(unit);
+	//刷新
+	var refresh = $("input[id='gdt_staticsPayplan_qry.refresh']")[0];
+	smartForm_doRefresh(refresh);
+}

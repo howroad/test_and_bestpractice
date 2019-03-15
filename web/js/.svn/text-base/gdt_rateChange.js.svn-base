@@ -1,0 +1,47 @@
+
+// 选择单位
+function selectNsClient(){
+	var url = 'GDEBIT@gdt_nsClientSlt.sf';
+	openwin(url, '单位列表', 500, 400);
+}
+function setNsclient(obj){
+	$("input[id$=.cltNo]").val(obj.cltNo);
+	$("input[id$=.cltName]").val(obj.cltName);
+}
+
+function showUmRateChange(){
+	var url = 'GDEBIT@gdt_umRateChange.sf';
+	location.href=url;
+}
+//异步加载业务品种
+function queryBussVares(obj,obj2){
+	var bussClass = obj.value;
+	var bussVariety = obj2.value
+	$.ajax({
+		  type: 'POST',
+		  url: "GDEBIT@QueryBussVaresBusiness.sf",
+		  async : false,
+		  data: {'bussClass':bussClass,'isInRate':'true'},
+		  dataType:'json',
+		  success: function(data) {
+			  var bussVar = $("select[id$=bussVariety]")[0];
+			  bussVar.innerHTML = "";
+			  bussVar[0] = new Option("", "");
+			  if (data.length > 0) {
+				  for ( var i = 0; i < data.length; i++) {
+					  var name = data[i].name;
+					  var value = data[i].value;
+					  if(data[i].value == "CLMS07"){
+						  
+					  }
+					  bussVar[i+1] = new Option(name, value);
+					  if(data[i].value == bussVariety && data[i].value !="" ){
+						 bussVar.value =  bussVariety;
+					  }
+				  }
+			  } else {
+				  bussVar = new Option("", "");
+			  }
+		  }
+	})
+}

@@ -1,0 +1,16 @@
+// 融资申请页面:保险--> 添加/查看/修改
+gdt = {}
+
+$(function(){
+	var m = document.getElementById('m').value;
+	//动态显示融资分类,融资品种
+	var pageCode = $("input[id='pageCode']").val();
+	var bussClass = document.getElementById(pageCode + '_info.bussClass');
+	var bussVariety = document.getElementById(pageCode + '_info.bussVariety');
+	//保险
+	bussClass.value="CLMS01";
+	bussVariety.value="CLMS29";
+	if(m=='a') queryBussVariety(bussClass,bussVariety);	
+	$("select[id$=.bussVariety]").val("CLMS29");
+})
+

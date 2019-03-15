@@ -1,0 +1,53 @@
+//间接融资-贷款》内保外贷
+$(function(obj){
+	/*var bussClass = $("select[id$=.bussClass]").val('CLMS02');*/
+	var bussClass = $("select[id$='.bussClass']").attr('value','CLMS02');
+	doChange(bussClass[0]);
+	//隐藏业务品种和分类,展示值
+	/*$("select[id$=.bussVariety]").val('CLMS12');*/
+	$("select[id$='.bussVariety']").attr('value','CLMS12');
+	var bussVariety = $("select[id$='.bussVariety']");
+	var cltName = $("input[id$='.cltName']").val();
+	var apply = $("input[id$='_form.applyId']").val();
+
+	if(apply != undefined && apply != null && apply != ''){
+		var clt = $("input[id$='_info.cltName']");
+		doHiddenApply(clt);
+		doHidden(bussClass,bussVariety);
+	}
+	
+	var m = document.getElementById('m').value;
+	if(m=='e' || m == 'v' || m == ''){
+		doHidden(bussClass,bussVariety);
+	}
+
+	var channel = $("input[id$='gdt_conInOut_form.channel']").val();
+    //当channel字段不为GDEBIT时，将带入的数据置换为不可写
+	if(isNotNull(channel) && channel != "GDEBIT"){
+		var table = $("#gdt_conInOut_info");
+		doReadOnly(table);
+	}
+});
+
+
+//
+//function selectOutAssBank(obj){
+//	var tr = nstc.sf.findParent(obj, 'tr');
+//	var rowIndex = tr.rowIndex - 1;
+//	var url = "GDEBIT@gdt_associateBankSlt.sf?isClear=1&rowIndex="+rowIndex;
+//	openwin(url, '金融合作网点列表', 500, 400);
+//}
+//
+//function setOutAssBank(obj){
+//	var assBankId= obj.assBankId;
+//	var assBankName = obj.assBankName;
+//	//校验 银行 和 币种 
+//	checkBankAndCur(rowIndex,assBankId,assBankName);
+//	try {
+//		$("input[id$='_amount.assBankId']")[rowIndex].value=assBankId;
+//		$("input[id$='_amount.assBankName']")[rowIndex].value=assBankName;
+//	} catch (e) {
+//		$("input[id$='_info.assBankId']").val(assBankId);
+//		$("input[id$='_info.assBankName']").val(assBankName);
+//	}
+//}

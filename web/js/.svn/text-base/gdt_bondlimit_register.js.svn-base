@@ -1,0 +1,205 @@
+//录入页面
+$(function(obj) {
+	var div = $("div[id$='_log']")[0];
+	var logId = $("[id$='gdt_log.titleId']")[0];
+	if(div != undefined && div != null){
+		div.style.display = 'none';
+	}
+	if(logId != undefined && logId != null){
+		logId.innerHTML = "债券注册额度日志" ;
+	}
+	
+	var m = document.getElementById('m').value;
+	if(m == 'v'){
+		$("font").text("");
+		div.style.display = '';
+	} else{
+		changeIssueMethod();
+	}
+});
+
+//保存按钮
+function doEntrySave(obj){
+	$("[id$=.isApprove]").val("0");
+	if(!saveCheck()){
+		return ;
+	}
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	if(!checkFileUploadControl("009")){
+		return;
+	}
+	smartForm_doSave(obj);
+}
+
+//提交按钮
+function doEntrySubmit(obj){
+	$("[id$=.isApprove]").val("1");
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	if(!checkFileUploadControl("009")){
+		return;
+	}
+	if(!saveCheck()){
+		return ;
+	}
+	smartForm_doSave(obj);
+}
+
+//提交/保存  之前先进行校验
+function saveCheck(){
+	var list=document.getElementById('gdt_bondlimit_under');
+	var trs=$(list).find('tbody tr:visible');
+	if (trs.length < 1) {
+		alert("请录入承销机构");
+		return false;
+	}
+	
+	
+	var files = $('input[id$=applyFiles_filetext]');
+	if(!validateFileForamtBatch(files)){
+		alert("系统不允许上传可执行格式的文件");
+		return false;
+	}
+	return true;
+}
+//重置
+function doReSet(obj){
+	var m = document.getElementById('m').value;
+	var url = "GDEBIT@gdt_bondlimit_register.sf?m=a";
+	location.href = url;
+} 
+
+function setNsclient(obj){
+	$("input[id$=.cltNo]").val(obj.cltNo);
+	$("input[id$=.cltName]").val(obj.cltName);
+}
+/**
+ * 校验有效期是否是正整数
+ * @param obj
+ */
+function checkYear(obj){
+	if(obj.value == ''){
+		return;
+	}
+	obj.value = obj.value.replace(/[^\d]/g,"");
+	if(obj.value==0){
+		obj.value = "";
+	}
+	var reg = /^\+?[1-9][0-9]*$/;
+	if (!reg.test(obj.value)){
+		alert("请输入正整数");
+		obj.value = "";
+		obj.focus();
+		return ;
+	}
+	var year = obj.value;
+	var startDate = $("input[id$='.issueDate']").val();
+	if (startDate != undefined) {
+		var str = startDate.split("-");
+		var y = parseInt(str[0])+parseInt(year);
+		$("input[id$='.endDate']").val(y+'-'+str[1]+'-'+str[2]);
+	}
+}
+//计算到期日
+function setEndDate(){
+	var issueDate = $('input[id$=.issueDate]').val();
+	var endDate = $('input[id$=.endDate]').val();
+	if(!compareDate(issueDate, endDate, '开始日不能晚于到期日')){
+		$('input[id$=_info.endDate]').val('');
+		return false;
+	}
+	var periodValidity = $('input[id$=.periodValidity]').val();
+	if(periodValidity != '' && issueDate != '') {
+	   	var start = new Date(Date.parse(issueDate.replace(/\-/g, '/')));
+	   	var year = start.getYear() + (periodValidity *1);
+	   	var month = start.getMonth() + 1;
+	   	var day = start.getDate();
+	    month = month < 10 ? "0" + month : month;
+	    day  = day < 10 ? "0" + day : day;
+	   	$('input[id$=.endDate]').val(year+"-"+month+"-"+day);
+	}
+}
+//删除承销机构
+function doDelete(){
+	var list = $("div[id$='_under']");
+	var checks = list.find('input[id$="_check"]:checked');
+	if(checks == undefined || checks.length==0){
+		alert("至少选择一条数据");
+		return;
+	}
+	$(checks).each(function(){
+		nstc.sf.delCurrRow(this)
+	});
+}
+//修改债券类型
+function changeIssueMethod(){
+	var issueMethod = $('select[id$=.issueMethod]').val();
+	//永续债，有效期、到期日为非必填
+	if (issueMethod == '8' ) {
+		$('input[id$=.endDate]').removeAttr("validate");
+		$('input[id$=.periodValidity]').removeAttr("validate");
+		$("[doc=periodValidity]").find("font").text("");
+		$("[doc=endDate]").find("font").text("");
+	} else {
+		
+		$('input[id$=.endDate]').attr("validate","require|");
+		$('input[id$=.periodValidity]').attr("validate","require|");
+		$("[doc=periodValidity]").find("font").text("*");
+		$("[doc=endDate]").find("font").text("*");
+	}
+	
+}
+function checkRegisterNo(obj){
+	var registerNo = obj.value;
+	if(registerNo == undefined || registerNo == null || registerNo == ""){return ;}
+	$.ajax({
+		type: 'POST',
+		url: "GDEBIT@CheckRegisterNoBusiness.sf",
+		async : false,
+		data: {'registerNo':registerNo},
+		success: function(data) {
+			if(data != "true"){
+				obj.value = ""; 
+				alert("注册通知书/无异议函编号 重复！");
+				
+			}
+		},
+		error:function(){
+			alert("业务繁忙!");
+		}
+	});
+}
+
+function checkDate(obj){
+	var date = obj.value;
+	var endDate = $("input[id$='endDate']").val();
+	var issueDate = $("input[id$='issueDate']").val();
+	if(!compareDate(date,endDate,"签发日期不能比到期日大")){
+		obj.value = "";
+	}
+	if(!compareDate(issueDate,date,"签发日期不能比到期日大")){
+		obj.value = "";
+	}
+}
+/**
+ * 增加GridUnit行
+ *
+ * @param obj
+ */
+function smartForm_add(obj) {
+	try {
+		var names = obj.name.split('.');
+		var unitname = names[0];
+		return nstc.sf.addRow(unitname, "tableCopy_" + unitname);
+	} catch (e) {}
+	try{
+		var frameId = window.frameElement && window.frameElement.id || '';
+		if(window.parent != window)
+			window.parent.smartForm_iFrameHeight(frameId);
+	}catch(e){}
+}

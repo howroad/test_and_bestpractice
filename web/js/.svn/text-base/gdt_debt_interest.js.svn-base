@@ -1,0 +1,86 @@
+var swidth = window.screen.width;
+var sheight = window.screen.height;
+
+function getinterchart(){
+	var nameArray=new Array();
+	var amtArray=new Array();
+	var perArray=new Array();
+	var leg=new Array();
+	var date=$("[id$='date']").val();
+	if(date==null&&date==""){
+		alert('请选择正确的日期！');
+	}else{
+	
+	$.ajax({
+		type : 'POST',
+		url : "GDEBIT@AjaxDebtInterest.sf",
+		async : false,
+		data : {
+			"date" : date
+		},
+		dataType : "json",
+		success : function(da) {
+			for(var i=0;i<da.length;i++){
+				 amtArray[i]=da[i].amount;
+				 nameArray[i]=da[i].title;
+				 perArray[i]=da[i].percent;
+					leg[i] = {
+							value : da[i].percent,
+							name : da[i].title
+						};
+			 }
+		}
+	});
+	// add一个图形的div
+	var div = document.getElementById('gdt_debt_interest_chart.content');
+	div.innerHTML = '<div style="border-width:1px 1px 0 1px;border-color:#C8C8C8;border-style:solid;height:40px;">'
+
+	+'<div style="border-width:0 1px 1px 1px;border-color:#C8C8C8;border-style:solid;height:700px">'
+	+'<div id="mainPie" style="width:'+swidth*0.42+'px;height:400px;">'
+	+'</div>'
+	+'</div>';
+
+	var option = {
+		    title : {
+		        text: '债务利息类别',
+		        x:'center'
+		    },
+		    tooltip : {
+		        trigger: 'item',
+		        formatter: function(params) {
+		        	var res = params.seriesName+'<br/>';
+		        	res+=params.name+':';
+		        	for(var i=0;i<perArray.length;i++){
+		        		if(params.value==perArray[i])
+		        			res+=amtArray[i];
+		        	}
+		        	res+='('+params.percent.toFixed(2)+'%)';
+		        	return res;
+		        }
+		    },
+		    legend: {
+		        orient: 'vertical',
+		        left: 'left',
+		        data: leg
+		    },
+		    series : [
+		        {
+		        	name: '金额单位：元',
+		            type: 'pie',
+		            radius : '55%',
+		            center: ['50%', '60%'],
+		            data:leg,
+		            itemStyle: {
+		                emphasis: {
+		                    shadowBlur: 10,
+		                    shadowOffsetX: 0,
+		                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+		                }
+		            }
+		        }
+		    ]
+		};
+	var myPieChart = echarts.init(document.getElementById('mainPie'));
+	myPieChart.setOption(option);
+	}
+} 		

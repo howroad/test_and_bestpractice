@@ -1,0 +1,378 @@
+//审批通过
+function doApply(btnObj) {
+	doSubmitBtn(btnObj,1);
+}
+//审批驳回
+function doReject(btnObj) {
+	doSubmitBtn(btnObj,2);
+}
+//撤销
+function doCancel(btnObj) {
+	doSubmitBtn(btnObj,3);
+}
+//提交审批按钮 btntype 1 审批通过  2 驳回  3撤销
+function doSubmitBtn(btnObj,btnType){
+	var checkNum=getCheckNum();
+	if (checkNum == 0) {
+		alert("至少选择一条记录！");
+		return;
+	}
+	var reason = $("[id$=.attitude]").val();
+	
+	if(btnType != "1"){
+		if (reason.trim() == null || reason.trim() == '') {
+			alert("请填写审批意见");
+			return;
+		}
+	}
+	var special_array = getSpecialCharacters().split(",");
+	for ( var i = 0; i < special_array.length; i++) {
+		 if(reason.indexOf(special_array[i]) != -1){
+				alert('审批意见输入框禁止输入非法字符:' + special_array[i]);
+				return;
+		  }
+	}
+	submitForm(btnObj,btnType,reason);
+}
+
+function submitForm(btnObj,btnType,reason){
+	var taskKey = $("[id$=.taskKey]").val();
+	var flowKey = $("[id$=.flowKey]").val();
+	var caseIdsStr = getCheckCaseId();
+	var form = nstc.sf.findParent(btnObj, "FORM");
+	form.action = $('#appNo').val() + '@' + btnObj.id + ".sf?execType="+btnType+"&caseIdsStr="+caseIdsStr
+				+"&attitude="+reason+"&taskKey="+taskKey+"&flowKey="+flowKey;
+	/*var flag = nstc.sf.validateForm(btnObj);
+	if (true == flag){
+		form.submit();
+	}*/
+	form.submit();
+}
+
+function getSpecialCharacters(){
+	return "\",',/**/,||,--, and , or , in ,order by,select ,from ,drop ,update ,insert ,where ,declare," +
+					"union,convert,master.,dbo.,sysobjects,sys.,[master],[dbo],xp_cmdshell,script,<,>,*,&,/,{,},#";
+}
+
+//获取选中的要审批的caseid 多个用,分割
+function getCheckCaseId(){
+	var caseIdsStr = "";
+	var checkObj = $("[id$=._check]:visible");
+	for ( var i = 0; i < checkObj.length; i++) {
+		if (checkObj[i].checked) {
+			var caseId = $(nstc.sf.findParent(checkObj[i], "TR")).find("[id$=.caseId]").val();
+			if(caseIdsStr==''||caseIdsStr==null){
+				caseIdsStr = caseId;
+			}else{
+				caseIdsStr = caseIdsStr+","+caseId;
+			}
+			
+		}
+	}
+	return caseIdsStr;
+}
+function getCheckNum(){
+	var checkObj = $("[id$=._check]:visible");
+	var checkNum = 0;
+	for ( var i = 0; i < checkObj.length; i++) {
+		if (checkObj[i].checked) {
+			checkNum++;
+		}
+	}
+	return checkNum;
+}
+function doBackUrl(){
+	var backUrl =  $("[id$=.backUrl]").val();
+	window.location=backUrl;
+}
+
+function getWebAppNo1(){
+	var webAppNo = 'SmartPage';
+	try {
+		if(typeof(eval("getWebAppNo")) == "function"){
+			webAppNo = getWebAppNo(webAppNo);
+		}
+	  } catch(e) {
+		  webAppNo = 'SmartPage';
+	  }
+	  return webAppNo;
+}
+
+//查看流程实例
+function viewCase(caseId,taskKey) {
+	//弹出窗口的宽度
+	var iWidth= 1200;
+	//弹出窗口的高度
+	var iHeight = 600;	 
+	//获得窗口的垂直位置;
+	var y = (window.screen.availHeight-30-iHeight)/2;	
+	//获得窗口的水平位置;
+	var x = (window.screen.availWidth-10-iWidth)/2;	  
+	var appNo = getWebAppNo1();
+	var url = '../' + appNo + '/BIZFLOW@flowVersion.do?mode=viewCase'+'&caseId='+caseId+"&taskKey="+taskKey;
+	window.open(url,'查看流程','height='+iHeight+',width='+iWidth+',top='+y+',left='+x+',toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no');
+}
+//显示工作流详情
+function showFlowDetail(flowKey,fmId,obj){
+	var url = "";
+	var title = "";
+	var tr = nstc.sf.findParent(obj, 'tr');
+	var bussVariety = $(tr).find('input[id$=.bussVariety]').val();
+	if(flowKey=='GDEBIT.FLOW.001'){
+		/*url = 'GDEBIT@gdt_financeApplyEntry.sf?m=v&applyId=' + fmId;
+		if(bussVariety == 'CLMS07'){
+			url = 'GDEBIT@gdt_finAppEntry_yt.sf?m=v&applyId=' + fmId;
+		}else if(bussVariety == 'CLMS11'){
+			url = 'GDEBIT@gdt_discfinanceApplyEntry.sf?m=v&applyId=' + fmId;
+		} else if(bussVariety == 'CLMS15'){
+			url = 'GDEBIT@gdt_financeApplyEntryLC.sf?m=v&applyId=' + fmId;
+		}else if(bussVariety == 'CLMS10'){
+			url = 'GDEBIT@gdt_finAppEntry_draft.sf?m=v&applyId=' + fmId;
+		}else if(bussVariety == 'CLMS17' || bussVariety == 'CLMS19'){
+			url = 'GDEBIT@gdt_finAppEntry_ImpLCBill.sf?m=v&applyId=' + fmId;
+		}else if(bussVariety == 'CLMS21'){
+			url = 'GDEBIT@gdt_finAppEntry_ExpLCBill.sf?m=v&applyId=' + fmId;
+		}else if(bussVariety == 'CLMS27'){
+			url = 'GDEBIT@gdt_finAppEntry_forfaitin.sf?m=v&applyId=' + fmId;
+		}else if(bussVariety == 'CLMS22'){
+			url = 'GDEBIT@gdt_finAppEntry_ExpLCLoan.sf?m=v&applyId=' + fmId;
+		}*/
+		var url = getApplyUrl(bussVariety) + '?m=v&applyId=' + fmId+"&bussVariety="+bussVariety;
+		title = "融资申请待审批详情";
+	}else if(flowKey=='GDEBIT.FLOW.002'){
+		doSelContract(bussVariety,null,fmId,"v");
+		return;
+		
+	}else if(flowKey=='GDEBIT.FLOW.003'){
+		doSelAmendment(variety,fmId,contractId,"v");
+		return;
+	}else if(flowKey=='GDEBIT.FLOW.004'){
+		var tr = nstc.sf.findParent(obj, "TR");
+		var bussVariety = $(tr).find("input[id$='.bussVariety']").val();
+		var url = 'GDEBIT@gdt_creditChangeInput.sf?m=v&fmId=' 
+			+ fmId + "&contractId=" + contractId;;
+		openwin(url, '授信占用变更详情', 1200, 600);
+		return;
+	}else if(flowKey=='GDEBIT.FLOW.005'){
+		var tr = nstc.sf.findParent(obj, "TR");
+		var url = 'GDEBIT@gdt_guaChangeInput.sf?m=v&fmId='+fmId;
+		
+		var guaranteeType = $(tr).find("input[id$='.guaranteeType']").val();
+		var contractId = $(tr).find("input[id$='.contractId']").val();
+		var occupyId = $(tr).find("input[id$='.occupyId']").val();if(occupyId == undefined)occupyId = null;
+		var pledgeId = $(tr).find("input[id$='.pledgeId']").val(); if(pledgeId == undefined || pledgeId == '')pledgeId = null;
+		url = url +"&contractId="+contractId+"&occupyId="+occupyId+"&pledgeId="+pledgeId+"&guaranteeType="+guaranteeType;
+		openwin(url, '担保占用变更详情', 1250, 600);
+		return;
+	}else if(flowKey=='GDEBIT.FLOW.006'){
+		
+	}else if(flowKey=='GDEBIT.FLOW.007'){
+		
+	}else if(flowKey=='GDEBIT.FLOW.008'){
+		var url = "GDEBIT@gdt_umRateChangeDetail.sf?fmId=" + fmId;
+	} else if (flowKey=='GDEBIT.FLOW.009'){
+		var url = 'GDEBIT@gdt_bondlimit_register.sf?m=v&bondissueId='+fmId;
+	}
+	openwin(url,title, 900, 550);
+}
+//授信申请查看
+function showContractDetail(obj){
+	var tr = nstc.sf.findParent(obj, 'tr');
+	var contractId = $(tr).find('input[id$=.contractId]').val();
+	var url = 'CLMS-Web@clms_creditContractEntry.sf?m=v&contractId=' + contractId;
+	openwin(url, '合同录入详情', 800, 600);
+}
+
+
+/**
+ * 判断是否有非法字符
+ * 
+ * @param obj
+ * @param length
+ */
+function checkSpecialChar(obj,length){
+	var name = obj.alt;
+	var str = obj.value;
+	
+	var special_array = getSpecialCharacters().split(",");
+	for ( var i = 0; i < special_array.length; i++) {
+		 if(str.indexOf(special_array[i]) != -1){
+				alert(name+'禁止输入非法字符:' + special_array[i]);
+				obj.focus();
+				return;
+			}
+	}
+	smartPage_checkLength(obj,length);
+}
+/**
+ * 非法字符集合
+ * 
+ * @returns {String}
+ */
+function getSpecialCharacters(){
+	return "',/**/,||,--, and , or , in ,order by,select ,from ,drop ,update ,insert ,where ,declare," +
+			"union,convert,master.,dbo.,sysobjects,sys.,[master],[dbo],xp_cmdshell,script,<,>,*,&,/,{,},\"";
+}
+
+//查看授信合同
+function showCredit(obj){
+	var tr = nstc.sf.findParent(obj, "TR");
+	var creditContractId = $(tr).find("input[id$='.creditContractId']").val();
+	var url = 'CLMS-Web@clms_creditContractEntry.sf?m=v&contractId=' + creditContractId;
+	openwin(url, '授信合同详情', 900, 600);
+}
+
+//融资合同详情
+function showContractMsg(variety,contractId){
+	var url=""
+		if(variety == 'CLMS01'){
+			// 股票
+			url="GDEBIT@gdt_msgStock.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS02'){
+			// 债券
+			url="GDEBIT@gdt_msgBond.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS03'){
+			// 信托产品
+			url="GDEBIT@gdt_msgTrust.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS04'){
+			// 其他直接融资
+			url="GDEBIT@gdt_msgDirOther.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS05'){
+			// 流动资金贷款
+			url="GDEBIT@gdt_msgLiquidity.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS06'){
+			//项目贷款
+			url="GDEBIT@gdt_msgProject.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS07'){
+			//银团贷款
+			url="GDEBIT@gdt_msgSyndicate.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS08'){
+			//委托贷款
+			url="GDEBIT@gdt_msgEntrust.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS09'){
+			//间接融资-贷款》固定资产贷款
+			url="GDEBIT@gdt_msgFixed.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS10'){
+			//间接融资-贷款》承兑汇票
+			url="GDEBIT@gdt_msgAccbill.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS11'){
+			//间接融资-贷款》票据贴现
+			url="GDEBIT@gdt_msgBillDisc.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS12'){
+			//间接融资-贷款》内保外贷
+			url="GDEBIT@gdt_msgInOut.sf?m=v&contractId="+contractId+"&variety="+variety;;
+		}else if(variety == 'CLMS13'){
+			//间接融资-贷款》内存外贷
+			url="GDEBIT@gdt_msgOutOfMemory.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS14'){
+			//间接融资-贷款》其它
+			url="GDEBIT@gdt_msgLoanOther.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS15'){
+			//间接融资-贸易融资》进口L/C开证
+			url="GDEBIT@gdt_msgImportLC.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS16'){
+			//间接融资-贸易融资》进口T/T押汇
+			url="GDEBIT@gdt_msgImportTBill.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS17'){
+			//间接融资-贸易融资》进口L/C押汇	
+			url="GDEBIT@gdt_msgImportLCBill.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS18'){
+			//间接融资-贸易融资》T/T代付	
+			url="GDEBIT@gdt_msgTPayForAn.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS19'){
+			////间接融资-贸易融资》L/C代付	
+			url="GDEBIT@gdt_msgLCPayForAn.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS20'){
+			//间接融资-贸易融资》出口T/T押汇
+			url="GDEBIT@gdt_msgExportTBill.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS21'){
+			//间接融资-贸易融资》出口L/C押汇		
+			url="GDEBIT@gdt_msgExportLCBill.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS22'){
+			//间接融资-贸易融资》出口L/C打包贷款
+			url="GDEBIT@gdt_msgExportLCLoan.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS23'){
+			//间接融资-贸易融资》保理	
+			url="GDEBIT@gdt_msgFactor.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS24'){
+			// 贸易融资  -- 保函
+			url="GDEBIT@gdt_msgGuarantee.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS25'){
+			//间接融资：贸易融资：其他
+			url="GDEBIT@gdt_msgIndOther.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS26'){
+			//融资租赁 
+			url="GDEBIT@gdt_msgFinLease.sf?m=v&contractId="+contractId;
+		}else if(variety == 'CLMS27'){
+			//福费廷
+			url="GDEBIT@gdt_msgForfaiting.sf?m=v&contractId="+contractId;
+		}
+		else if(variety == 'CLMS28'){
+            //资产证券化
+            url="GDEBIT@gdt_msgAssetSecu.sf?m=v&contractId="+contractId;
+        }else if(variety == 'CLMS29'){
+            //保險
+            url="GDEBIT@gdt_msgInsurance.sf?m=v&contractId="+contractId;
+        }else if(variety == 'CLMS30'){
+            //基金 
+            url="GDEBIT@gdt_msgFund.sf?m=v&contractId="+contractId;
+        }else if(variety == 'CLMS31'){
+            //集合资管贷款 
+            url="GDEBIT@gdt_msgAssetManage.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }else if(variety == 'CLMS32'){
+            //非金债 
+            url="GDEBIT@gdt_msgNoGoldDebt.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }else if(variety == 'CLMS33'){
+            //信托贷款 
+            url="GDEBIT@gdt_msgTrustLoan.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }else if(variety == 'CLMS34'){
+            //外保内贷
+            url="GDEBIT@gdt_msgOutIn.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }else if(variety == 'CLMS35'){
+            //类保理
+            url="GDEBIT@gdt_msgClassFactor.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }else if(variety == 'CLMS36'){
+            //产业基金 
+            url="GDEBIT@gdt_msgIndustryFund.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }else if(variety == 'CLMS38'){
+            //保险债权计划
+            url="GDEBIT@gdt_msgICPlan.sf?m=v&contractId="+contractId+"&variety="+variety;
+        }
+	openwin(url, '合同详情', 1200,600);
+}
+//显示担保合同详情
+function showGuarantee(guaranteeId,guaranteeType){
+	if(guaranteeId==null||guaranteeId==''){
+		return ;
+	}
+	if(guaranteeType==null||guaranteeType==''){
+		return ;
+	}
+	var url = "";
+	/*if(guaranteeType=='G01'){
+		url = "GWMS-Web@gwms_showGuarantee_G01.sf?m=v&guaranteeId="+guaranteeId;
+	}else if(guaranteeType=='G02'){
+		url = "GWMS-Web@gwms_showGuarantee_G02.sf?m=v&guaranteeId="+guaranteeId;
+	}else if(guaranteeType=='G03'){
+		url = "GWMS-Web@gwms_showGuarantee_G03.sf?m=v&guaranteeId="+guaranteeId;
+	}else if(guaranteeType=='G04'){
+		url = "GWMS-Web@gwms_showGuarantee_G04.sf?m=v&guaranteeId="+guaranteeId;
+	}else if(guaranteeType=='G05'){
+		url = "GWMS-Web@gwms_showGuarantee_G05.sf?m=v&guaranteeId="+guaranteeId;
+	}*/
+	//获得担保
+	  if(guaranteeType=='G01'){
+	   url = "GWMS-Web@gwms_showGuaranteeDetail_G01.sf?m=v&guaranteeId="+guaranteeId;
+	  }else if(guaranteeType=='G02'){
+	   url = "GWMS-Web@gwms_showGuaranteeDetail_G02.sf?m=v&guaranteeId="+guaranteeId;
+	  }else if(guaranteeType=='G03'){
+	   url = "GWMS-Web@gwms_showGuaranteeDetail_G03.sf?m=v&guaranteeId="+guaranteeId;
+	  }else if(guaranteeType=='G04'
+	               || guaranteeType=='G07'
+	               || guaranteeType=='G08'){
+	   url = "GWMS-Web@gwms_showGuaranteeDetail_third.sf?m=v&guaranteeId="+guaranteeId;
+	  }else if(guaranteeType=='G05'){
+	   url = "GWMS-Web@gwms_showGuaranteeDetail_G05.sf?m=v&guaranteeId="+guaranteeId;
+	  } 
+	openwin(url, '担保合同详情', 900, 550);
+}

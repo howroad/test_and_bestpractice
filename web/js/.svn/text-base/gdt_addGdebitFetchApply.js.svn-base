@@ -1,0 +1,55 @@
+$(function(){
+	var m = $("input[id='m']").val();
+	
+	var div = $("div[id$='_log']")[0];
+	if (m == 'v') {
+		div.style.display = '';
+	} else {
+		div.style.display = 'none';
+	}
+});
+function setParPlanNo(obj) {
+	var tab = document.getElementById("gdt_addGdebitFetchApply_f");
+	$(tab).find("input[id$='associateNo']").val(obj.associateNo);
+	$(tab).find("input[id$='hopeFetchDate']").val(obj.actDate);
+	$(tab).find("input[id$='fetchtAmount']").val(obj.fetchAmount);
+	$(tab).find("select[id$='currencyNo']").val(obj.currencyNo);
+	$(tab).find("select[id$='assBankId']").val(obj.assBankId);
+	setDueDate();
+}
+function saveFetchApply(obj,handleFlag) {
+	var arriAcntDate = $("input[id$='hopeFetchDate']").val();
+	if (!valiPayInterestDate(arriAcntDate)) {
+		return;
+	}
+	//校验合同金额下，当前录入的提款金额是否合理
+	var fetchtAmount = $("input[id$='fetchtAmount']").val().excludeNotNumericDot();
+	if (!valiFetchAmount(fetchtAmount)) {
+		return;
+	}
+	if (!validateFinanceTerms(arriAcntDate)) {
+		return;
+	}
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	if(!checkFileUploadControl("010")){
+		return;
+	}
+	$("input[id$='isApprove']").val(handleFlag);
+	if(handleFlag==0){
+		smartForm_doSave(obj);
+		/*window.close();
+		 var refresh = top.Layer.getWin().document.getElementById("gdt_withdrawalsApply_qry.refresh");
+		 refresh.click();*/
+		
+	}else if(handleFlag==1){
+		smartForm_doSubmit(obj);
+		/*window.close();
+		 var refresh = top.Layer.getWin().document.getElementById("gdt_withdrawalsApply_qry.refresh");
+		 refresh.click();*/
+		
+	}
+	
+}

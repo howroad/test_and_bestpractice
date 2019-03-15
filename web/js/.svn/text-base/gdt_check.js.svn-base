@@ -1,0 +1,48 @@
+function myyearcheck(obj){
+	var month=$("[id$='months']").val();
+	var year=$("[id$='years']").val();
+	
+	if(year!=null){
+		if(year!=''){
+				var buttonObj = document.getElementById("gdt_financing_tool_from.refresh");
+				if(obj){
+					smartForm_doRefresh(obj);
+				}
+			}else{
+				alert('年份不能为空!');
+			}
+		}
+};
+$(function(){
+	$("select[id$='moneys']").attr('value',$("input[id$='_form.money']").val());
+	
+});
+function changeMoney(obj){
+	
+	var month=$("[id$='months']").val();
+	var year=$("[id$='years']").val();
+	
+	if( year!=null){
+		if( year!=''){
+			
+			var amountUnit = obj.value;
+			$("input[id='gdt_financing_tool_from.money']").val(amountUnit);
+			var refresh = $("[id$='gdt_financing_tool_form.refresh']")[0];
+			var buttonObj = document.getElementById("gdt_financing_tool_from.refresh");
+	
+			$("[id$='money']").attr('value',$("[id$='moneys']").val());
+			smartForm_doRefresh(refresh);
+			//$("input[id$='moneyUnit']").val($("select[id$='moneyUnit']").val());
+			$("[id$='moneys']").attr('value',$("[id$='moneys']").val());
+		}
+	}
+};
+
+
+function exportToExcel(obj) {
+	smartForm_doSave(obj);
+	obj.disabled = true;
+	var tokenVal = new Date().getTime();
+	document.getElementById("WK_REQ_TIME_TOKEN").value=tokenVal+"_";
+	obj.disabled = "";
+};

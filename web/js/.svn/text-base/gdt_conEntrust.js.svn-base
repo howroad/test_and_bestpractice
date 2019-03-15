@@ -1,0 +1,103 @@
+//间接融资-贷款》委托贷款
+$(function(obj){
+	/*var bussClass = $("select[id$=.bussClass]").val('CLMS02');*/
+	var bussClass = $("select[id$='.bussClass']").attr('value','CLMS02');
+	if (bussClass[0] != undefined) {
+		doChange(bussClass[0]);
+	}
+	//隐藏业务品种和分类,展示值
+	/*$("select[id$=.bussVariety]").val('CLMS08');*/
+	$("select[id$=.bussVariety]").attr('value','CLMS08');
+	var bussVariety = $("select[id$='.bussVariety']");
+	var cltName = $("input[id$='.cltName']").val();
+	var apply = $("input[id$='_form.applyId']").val();
+
+	if(apply != undefined && apply != ''){
+		var clt = $("input[id$='_info.cltName']");
+		doHiddenApply(clt);
+		if (bussClass[0] != undefined) {
+			doHidden(bussClass,bussVariety);
+		}
+	}
+	
+	/**
+	 * 获取委托单位编号,如果为空 则证明 是 集团外,不勾选选框
+	 */
+	var delegateCltNo = $("input[id$='_info.delegateCltNo']").val();
+	var delegateCltName = $("input[id$='_info.delegateCltName']").val();
+	if(delegateCltNo == undefined ||delegateCltNo == ""){
+		//显示输入框,隐藏选框
+		$("input[id$='delegateCltName_inner']").hide();
+		$("input[id$='delegateCltName_outer']").show();
+		$("input[id$='delegateCltName_outer']").val(delegateCltName);
+		$("input[id$='isDelegate']").attr('checked', false);
+	}else{ 
+		$("input[id$='isDelegate']").attr('checked', 'checked');
+		$("input[id$='delegateCltName_outer']").hide();
+		$("input[id$='delegateCltName_inner']").show();
+		$("input[id$='delegateCltName_inner']").val(delegateCltName);
+	}
+	
+	var m = document.getElementById('m').value;
+	if(m!=null && m=='v'){
+		$("[id$='_info.isDelegate']:checkbox").attr("disabled",true);
+	}
+	
+	if(m=='e' || m == 'v' || m == ''){
+		if (bussClass[0] != undefined) {
+			doHidden(bussClass,bussVariety);
+		}
+	}
+	
+	var channel = $("input[id$='gdt_conEntrust_form.channel']").val();
+    //当channel字段不为GDEBIT时，将带入的数据置换为不可写
+	if(isNotNull(channel) && channel != "GDEBIT"){
+		var table = $("#gdt_conEntrust_info");
+		doReadOnly(table);
+	}
+});
+
+
+//选择委托单位
+function selectDelegate(){
+	//获取单位
+	var cltNo = $("input[id$='_info.cltNo']").val();
+//	if(cltNo == undefined || cltNo == null || cltNo == ""){
+//		alert("请先选择单位!");
+//		return;
+//	}
+	var url = "GDEBIT@gdt_nsClientSlt.sf?isClear=1&isAll=1";
+	openwin(url, '单位列表', 500, 400);
+}
+
+//选择集团内 or 集团外
+function checkInOrOut(){
+	var inner = $("input[id$='delegateCltName_inner']");
+	var outer = $("input[id$='delegateCltName_outer']");
+	inner.val("");
+	outer.val("");
+	$("input[id$='delegateCltNo']").val("");
+	$("input[id$='delegateCltName']").val("");
+	if(inner.is(":hidden")){
+		inner.show();
+		outer.hide();
+	}else{
+		inner.hide();
+		outer.show();
+	}
+}
+
+//集团外 失去焦点时间
+function setDelegateCltName(obj){
+	var delegateCltName = obj.value;
+	$("input[id$='delegateCltName']").val(delegateCltName);
+}
+
+
+function setDelegate(obj){
+	var delegateCltNo = obj.cltNo;
+	var delegateCltName = obj.cltName;
+	$("input[id$='delegateCltName_inner']").val(delegateCltName);
+	$("input[id$='delegateCltName']").val(delegateCltName);
+	$("input[id$='delegateCltNo']").val(delegateCltNo);
+}

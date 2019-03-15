@@ -1,0 +1,30 @@
+//   融资申请页面 
+$(function (){
+	//动态显示授信品种
+	var bussClass= $('select[id$=_qry.bussClass]').get(0);
+	var bussVariety=$('select[id$=_qry.bussVariety]').get(0);
+	queryBussVares(bussClass,bussVariety);
+})
+//查询操作
+function doQuery(obj){
+	var minAmount = $('input[id$=.minAmount]').val();
+	var maxAmount = $('input[id$=.maxAmount]').val();
+	var minStartDate = $('input[id$=.minStartDate]').val();
+	var maxStartDate = $('input[id$=.maxStartDate]').val();
+	var minEndDate = $('input[id$=.minEndDate]').val();
+	var maxEndDate = $('input[id$=.maxEndDate]').val();
+	if(!compareAmount(minAmount, maxAmount, '合同金额范围不合理')){
+		return;
+	} 
+	if(!compareDate(minStartDate, maxStartDate, '开始日期范围不合理')){
+		return;
+	} 
+	if(!compareDate(minEndDate, maxEndDate, '结束日期范围不合理')){
+		return;
+	} 
+	smartForm_doRefresh(obj)
+}
+//待处理
+function showWaitRecords(){
+	location.href='GDEBIT@gdt_ledgerWaitRds.sf';
+}

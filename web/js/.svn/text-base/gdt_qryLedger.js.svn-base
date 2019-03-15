@@ -1,0 +1,69 @@
+$(function(){
+	//金额单位
+	var unit = $("select[id='gdt_qryLedger_list.moneyUnit']");
+	var moneyUnit = $("input[id='gdt_qryLedger_qry.moneyUnit']").val();
+	if (moneyUnit == '') {
+		moneyUnit = unit.val();
+	}
+	//unit.val(moneyUnit);
+	unit.attr('value',moneyUnit);
+	$("span[id$='total']").html($("[id$='totalCount']").val());
+});
+
+//查询操作
+function doRefresh(obj){
+	var minAmount = $('input[id$=.minAmount]').val();
+	var maxAmount = $('input[id$=.maxAmount]').val();
+	var minEndDate = $('input[id$=.minDate]').val();
+	var maxEndDate = $('input[id$=.maxDate]').val();
+	if(!compareAmount(minAmount, maxAmount, '发生额范围不合理')){
+		return;
+	} 
+	if(!compareDate(minEndDate, maxEndDate, '发生日期范围不合理')){
+		return;
+	} 
+	smartForm_doRefresh(obj);
+}
+/**
+ * 台账管理录入界面
+ * @param obj
+ * @param type//1，台账计划；2，发生额登记；3，资金使用登记；
+ */
+function showLedger(obj,type,m){
+	var tr=$(obj).parents('tr').first();
+	var contractId=tr.find('input[id$="contractId"]').val();
+	var bussVariety=tr.find('input[id$="bussVariety"]').val();
+	var contexecId=obj.innerHTML;
+	var url='';
+	if(bussVariety==undefined){
+		return;
+	}else{
+		url="GDEBIT@gdt_ledgerLiquidity.sf?m="+m+"&type="+type+'&contractId='+contractId+'&contexecId='+contexecId;
+	}	
+	if(url != ""){
+		if(type==1){
+			openwin(url, '台账计划', 1200,800);
+		}else if(type==2){
+			openwin(url, '发生额登记', 1200,800);
+		}else if(type==3){
+			openwin(url, '资金使用登记', 1200,800);
+		}
+	}
+}
+
+function setAmountByUnit(obj) {
+	var unit = obj.value;
+	$("input[id='gdt_qryLedger_qry.moneyUnit']").val(unit);
+	var refreshObj = $("input[id='gdt_qryLedger_qry.refresh']")[0];
+	smartForm_doRefresh(refreshObj);
+}
+
+//提款详情
+function openFetchMoneyRegDetail(obj) {
+	var tr = $(obj).parents("tr:first");
+	var fetchNo = tr.find("input[id$=fetchNo]").val();
+	var contractId = tr.find("input[id$=contractId]").val();
+	var fmId = tr.find("input[id$=fetchRegId]").val();
+	var url = "GDEBIT@gdt_fetch_detail.sf?m=v&fetchNo=" + fetchNo + "&contractId=" + contractId+"&fmId="+fmId;
+	openwin(url, '提款详情', 1200, 1000);
+}

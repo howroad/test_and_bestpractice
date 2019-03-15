@@ -1,0 +1,102 @@
+// 基金--> 添加/查看/修改
+
+$(function(){
+	var m = document.getElementById('m').value;
+	
+	//其他税率格式化
+	var taxRate = $("input[id$='taxRate']");
+	var td = taxRate.parents("td").first();
+	td.html("<div id='1'>" + td.html() + "</div>");
+	//加载其他税率
+	var gdtTaxList = $("input[id$='.gdtTaxList']").val();
+	if (gdtTaxList != "" && gdtTaxList != "[]") {
+		var taxList = eval('('+gdtTaxList+')');
+		for (var i = 0; i < taxList.length; i++) {
+			if (i > 0) {
+				$("input[id$='addRate']").first().click();
+			}
+		}
+		var taxObjList = $("input[id$='taxRate']");
+		for (var i = 0; i < taxList.length; i++) {
+			var div = taxObjList.eq(i).parents("div").first();
+			var taxRate = div.find("input[id$='taxRate']");
+			var taxMemo = div.find("input[id$='taxMemo']")
+			taxRate.val(FormatMoney(taxList[i].taxRate, 2));
+			taxMemo.val(taxList[i].taxMemo);
+			if (m == 'v') {
+				taxRate.parent().attr('style','width: 20%; text-align: right; font-weight: bold;');
+				taxMemo.parent().attr('style','width: 75%; text-align: left; font-weight: bold;');
+				taxRate.parent().html(FormatMoney(taxList[i].taxRate, 2) + "%&nbsp;&nbsp;").append(taxRate);
+				taxMemo.parent().html(taxList[i].taxMemo).append(taxMemo);
+				div.find("input[type='button']").attr('style','width: 5%;').hide();
+			}
+		}
+	}else{
+		//查看模式下,隐藏+-
+		if (m == 'v') {
+			$("input[id$='addRate']").attr('style', 'width: 5%;').hide();
+		}
+	}
+	//计算金额
+	if(m != "a"){
+		calculateCost();
+	}
+	
+	//onblur事件绑定
+	$("input[id$='_info.amount']").blur(function(){calculateCost()});
+	$("input[id$='_info.trusteeshipRate']").blur(function(){calculateCost()});
+	$("input[id$='_info.additionalTaxRate']").blur(function(){calculateCost()});
+	$("input[id$='_info.managementRate']").blur(function(){calculateCost()});
+	$("input[id$='_info.educationalTariff']").blur(function(){calculateCost()});
+})
+
+gdt = {}
+
+/**
+ * 创建 其他税率 字段列表表
+ */
+gdt.buildOtherRateTable = function(){
+	
+}
+
+function setAssBank(obj){
+	var rowIndex = obj.rowIndex;
+	var assBankId = obj.assBankId;
+	var assBankName = obj.assBankName;
+	var bankNo = obj.bankNo;
+	var bankName = obj.bankName;
+	$("input[id$='_investor.assBankId']")[rowIndex].value = assBankId;
+	$("input[id$='_investor.investorName']")[rowIndex].value = assBankName;
+}
+
+function changeInvestorName(obj) {
+	var tr = $(obj).parents("tr").first();
+	tr.find("input[id$='_investor.assBankId']").val('');
+}
+
+function calculateCost(){
+	var $amount            = $("input[id$='_info.amount']");
+	var $trusteeshipRate   = $("input[id$='_info.trusteeshipRate']");
+	var $additionalTaxRate = $("input[id$='_info.additionalTaxRate']");
+	var $managementRate    = $("input[id$='_info.managementRate']");
+	var $educationalTariff = $("input[id$='_info.educationalTariff']");
+	
+	var amount            = getFloatVal($amount.val());
+	var trusteeshipRate   = getFloatVal($trusteeshipRate.val());
+	var additionalTaxRate = getFloatVal($additionalTaxRate.val());
+	var managementRate    = getFloatVal($managementRate.val());
+	var educationalTariff = getFloatVal($educationalTariff.val());
+	
+	$trusteeshipRate  .siblings("span").text("总额：" + calculateMoney(amount, trusteeshipRate)   +"元");
+	$additionalTaxRate.siblings("span").text("总额：" + calculateMoney(amount, additionalTaxRate) +"元");
+	$managementRate   .siblings("span").text("总额：" + calculateMoney(amount, managementRate)    +"元");
+	$educationalTariff.siblings("span").text("总额：" + calculateMoney(amount, educationalTariff) +"元");
+}
+function getFloatVal(rate){
+	rate = (rate == "" ? "0" : rate);
+	return parseFloat(rate.excludeNotNumericDot());
+}
+function calculateMoney(num1, num2){
+	var money = FormatMoney(accMul(accMul(num1, num2), 0.01), 2);
+	return money == 0 ? 0 : money;
+}

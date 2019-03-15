@@ -1,0 +1,109 @@
+$(function(){
+	 var cltName = $('[id$="qry.cltName"]');
+	 var cltNo = $('[id$="qry.cltNo"]').val();
+	 if(cltNo !=""){
+		 showAsText(cltName);
+	 }
+	var isTieXian = $('[id$=".isTieXian"]').val();
+	if ('true' == isTieXian) {
+		$('[id$=".bussClass"]').val('CLMS02').attr({"disabled":true});
+		$('[id$=".bussVariety"]')
+		.empty().append($("<option>")
+		.text('票据贴现')
+		.val('CLMS11'))
+		.attr({"disabled":true});
+		
+		//$('[id$=".bussVariety"]').val('CLMS11').attr({"disabled":true});
+	}
+	$("[id$='.bussClass']").change();
+});
+/*
+function showAsText($obj){
+	$obj.hide();
+	if($obj.get(0).tagName=='select' || $obj.get(0).tagName=='SELECT'){
+		var temp=$obj;
+		$obj.parent().text($obj.find('option[value="'+$obj.val()+'"]').text()).append(temp);
+	}else{
+		$obj.parent().text($obj.val()).append($obj);
+	}
+}*/
+//选择单位
+function selectClient(){
+	var byCltNoTreeNo = $('[id$="qry.byCltNoTreeNo"]').val();
+	var url = "GDEBIT@gdt_nsClientSlt.sf?byCltNoTreeNo="+byCltNoTreeNo;
+	openwin(url, '单位列表', 500, 400);
+}
+function doRefresh(obj){
+	var minAmount = $('input[id$=.minAmount]').val();
+	var maxAmount = $('input[id$=.maxAmount]').val();
+	if(!compareAmount(minAmount, maxAmount, '合同金额范围不合理')){
+		return;
+	} 
+	var minsDate = $('input[id$=_qry.minStartDate]').val();
+	var maxsDate = $('input[id$=_qry.maxStartDate]').val();
+	if(!compareDate(minsDate, maxsDate, '开始日期范围不合理')){
+		return;
+	}
+	var mineDate = $('input[id$=_qry.minEndDate]').val();
+	var maxeDate = $('input[id$=_qry.maxEndDate]').val();
+	if(!compareDate(mineDate, maxeDate, '到期日期范围不合理')){
+		return;
+	}
+	smartForm_doRefresh(obj);
+}
+function callBack(obj){
+	var tr=$(obj).parents('tr').first();
+	var contractNo=tr.find('input[id$="contractNo"]').val();
+	var contractId=tr.find('input[id$="contractId"]').val();
+	var currencyNo=tr.find('input[id$="currencyNo"]').val();
+	var result={};
+	result.contractNo=contractNo;
+	result.contractId=contractId;
+	result.currencyNo=currencyNo;
+	//贴现ajax查询
+	var isTieXian = $('[id$=".isTieXian"]').val();
+	if ('true' == isTieXian) {
+		$.ajax({
+			  type: 'POST',
+			  url: "GDEBIT@QueryConBillDiscBusiness.sf",
+			  async : false,
+			  data: {'contractId':contractId},
+			  dataType:'json',
+			  success: function(data) {
+				  result.info = data;
+			  }
+		});
+	}
+	top.Layer.getWin().setGdtCon(result);
+	windowClose();
+}
+
+//异步加载业务品种
+function queryBussVaresForSelect(obj,obj2){
+	var bussClass = obj.value;
+	var bussVariety = obj2.value
+	$.ajax({
+		  type: 'POST',
+		  url: "GDEBIT@QueryBussVaresForSelectBusiness.sf",
+		  async : false,
+		  data: {'bussClass':bussClass},
+		  dataType:'json',
+		  success: function(data) {
+			  var bussVar = $("select[id$=bussVariety]")[0];
+			  bussVar.innerHTML = "";
+			  bussVar[0] = new Option("", "");
+			  if (data.length > 0) {
+				  for ( var i = 0; i < data.length; i++) {
+					  var name = data[i].name;
+					  var value = data[i].value;
+					  bussVar[i+1] = new Option(name, value);
+					  if(data[i].value == bussVariety && data[i].value !="" ){
+						 bussVar.value =  bussVariety;
+					  }
+				  }
+			  } else {
+				  bussVar = new Option("", "");
+			  }
+		  }
+	})
+}

@@ -1,0 +1,351 @@
+// 融资申请页面 --> 添加/查看/修改
+
+$(function(){
+	var m = document.getElementById('m').value;
+	//动态显示融资分类,融资品种
+	var pageCode = $("input[id='pageCode']").val();
+	var bussClass = document.getElementById(pageCode + '_info.bussClass');
+	var bussVariety = document.getElementById(pageCode + '_info.bussVariety');
+	//默认银团
+	bussClass.value="CLMS02";
+	bussVariety.value="CLMS07";
+	if(m=='a') queryBussVariety(bussClass,bussVariety);	
+	$("select[id$=.bussVariety]").val("CLMS07");
+	//m=v模式下显示申请日志
+	var div = document.getElementById('div.gdt_log');
+	div.style.display = 'none';
+	if(m!=null&&m=='v'){
+		div.style.display = '';
+	}
+	
+	//实现删除附件,页面不刷新   
+	var tab = $("input[id='"+pageCode+"_info._applyFiles_del']").prev();
+	var tBody = tab.find('tbody');
+	//获取tBody下面所有的子节点
+	tBody.children().each(function(){
+		//获取每个tr下的 第二个 td
+		var tdObj = $(this).children('td').eq(1);
+		//获取每个tr下的 第二个 td 下 的第二个 a 标签
+		var aObj = tdObj.children('a').eq(1);
+		var href = $(aObj).attr("href");
+		//重置href属性,不让页面跳转
+		$(aObj).attr("href","javascript:void(0)");
+		//添加点解事件
+		aObj.click(function(){
+			$.ajax({
+				type: 'POST',
+				url: href,
+				async : false,
+				dataType: "text",
+				success: function(data) {
+					//删除成功,删除这一行 tr
+					$(aObj).parent().parent().remove();
+				}
+		  	});  
+		});
+	})
+	/*var bzj = $("div[id$='_lgm']")[0];
+	if (bzj != null && bzj != '') {
+		bzj.style.display = '';
+	}*/
+});
+
+//保存按钮
+function doEntrySave(obj){
+	$("[id$=.isApprove]").val("0");
+	if(!saveCheck()){
+		return ;
+	}
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	if (!checkFileUploadControl("001")) {
+		return;
+	}
+	smartForm_doSave(obj);
+}
+
+//提交按钮
+function doEntrySubmit(obj){
+	$("[id$=.isApprove]").val("1");
+	if(!saveCheck()){
+		return ;
+	}
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	if (!checkFileUploadControl("001")) {
+		return;
+	}
+	smartForm_doSave(obj);
+}
+//合同金额删除按钮
+function doDelAmount(obj){
+	var list=$('div[id$="gdt_yt_amount"]');
+	var checks=list.find('input[id$="_check"]:checked');
+	if(checks==undefined || checks.length==0){
+		alert("至少选择一条数据");
+		return;
+	}
+	$(checks).each(function(){
+		nstc.sf.delCurrRow(this)
+	});
+}
+
+
+// 提交/保存  之前先进行校验
+function saveCheck(){
+	var pageCode = $("input[id='pageCode']").val();
+	var bussVariety = document.getElementById(pageCode + '_info.bussVariety').value;
+	if(!doCheckBankIsNull(bussVariety)){
+		alert("合作金融网点不存在！");
+		return false;
+	}
+	var startDate = $('input[id$=.startDate]').val();
+	var endDate = $('input[id$=.endDate]').val();
+	//校验日期
+	if(!compareDate(startDate, endDate, '开始日不能晚于到期日')){
+		return false;
+	}
+	
+	//校验合同金额是否存在
+	//var trs = $("tr[id$='gdt_financeApplyEntry_amount']:visible");
+	var currencyNos = $("select[id$='_amount.currencyNo']");
+	if(currencyNos.length == 1){
+		alert("请选择合同金额!");
+		return false;
+	}
+	
+	//校验基准类率，利率浮动值，利率
+//	if(!checkBaseRateAndRate()){
+//		return false;
+//	}
+	
+	//校验占比是否合法  和为100
+	if(!doCheckOccupy()){
+		alert("占比总和应为100");
+		return false;
+	}
+	
+	
+	//校验融资合同 与 担保合同 大行是否相同
+	//TA0640取消校验 by 20180719
+//	if(!doCheckBank()){
+//		alert("融资合同所属大行与授信合同所属大行不一致");
+//		return false;
+//	}
+	
+	
+	//校验是否输入授信占用金额
+	if(!doCheckCreditAmount()){
+		alert("请输入授信占用金额");
+		return false;
+	}
+	
+	return true;
+}
+
+function checkBaseRateAndRate(){
+	var flag = true;
+	/*$("table[id='gdt_yt_amount']").find("tbody tr:visible").each(function (){
+		var baseRate = $(this).find('input[id$=_amount.baseRate]').val();
+		var floatType = $(this).find('select[id$=_amount.floatType]').val();
+		var floatValue = $(this).find('input[id$=_amount.floatValue]').val();
+		if(baseRate=="" && floatType!=2 && floatValue==''){
+			alert("没有录入基准利率，不允许选择其他利率变更方式，只允许选择不变。");
+			flag = false;
+		}
+		if(baseRate!="" && floatType!=2 && floatValue!=''){
+			alert("请录入利率浮动值。");
+			flag = false;
+		}
+	});*/
+	return flag;
+}
+function doCheckBank(){
+	var flag = true;
+	var pageCode = $("input[id='pageCode']").val();
+	$("table[id="+pageCode+"_amount]").find("tbody tr:visible").each(function(){
+		//var tr = nstc.sf.findParent(this, 'tr');
+		var creditBankId = $(this).find('input[id$=_amount.creditBankId]').val();
+		var assBankId = $(this).find('input[id$=_amount.assBankId]').val();
+		if(assBankId!= undefined && assBankId != '' && assBankId != null
+				&& creditBankId!= undefined && creditBankId != '' && creditBankId != null){
+			var state = checkConAndCreditBank(assBankId,creditBankId);
+			if(state == "false"){
+				flag = false;
+			}
+		}
+	})
+	return flag;
+}
+
+
+function doCheckOccupy(){
+	var occupyList = $("input[id$='_amount.occupyProportion']");
+	var count = 0;
+	occupyList.each(function(){
+		var val = this.value;
+		if(val != null && val != "" && val != Number.NaN){
+			count = accadd(count, parseFloat(val));
+		} 
+	});
+	if(parseFloat(count) != parseFloat(100)){
+		return false;
+	}else{
+		return true;
+	}
+}
+
+function  doCheckCreditAmount(){
+	var bussVariety = $("select[id$='_info.bussVariety']").val();
+	if(bussVariety == undefined || bussVariety == '' ||bussVariety == null){
+		bussVariety = $("input[id$='_info.bussVariety']").val();
+	}
+	var flag = true;
+	if(bussVariety == 'CLMS07'){
+		$("input[id$='_amount.useAmount']:visible").each(function(){
+			var tr = nstc.sf.findParent(this, 'tr');
+			var useAmount = $(tr).find('input[id$=_amount.useAmount]').val();
+			var creditNo = $(tr).find('input[id$=_amount.creditNo]').val();
+			if(creditNo != '' && useAmount == ''){
+				flag = false;
+				return false;
+			}
+		});
+	}
+	return flag;
+}
+
+function setAssBank(obj){
+	//校验 银行 和 币种 
+	var flag = checkBankAndCur(obj);
+	var rowIndex = obj.rowIndex;
+	var assBankId = obj.assBankId;
+	var assBankName = obj.assBankName;
+	var bankNo = obj.bankNo;
+	if(!flag){
+		$("input[id$='_amount.assBankId']")[rowIndex].value=assBankId;
+		$("input[id$='_amount.assBankName']")[rowIndex].value=assBankName;
+		$("input[id$='_amount.bankNo']")[rowIndex].value=bankNo;
+	}
+}
+
+//校验一个申请同一家银行,多个金额合同信息不允许出现相同币种
+function checkBankAndCur(obj){
+	var rowIndex ;
+	var flag = true;
+	try {
+		rowIndex = obj.rowIndex;
+	} catch (e){
+		rowIndex = undefined;
+	}
+	var bussVariety = obj.bussVariety;
+	if(bussVariety == undefined) bussVariety = $("[id$='.bussVariety']").val();
+	//银团
+	if(bussVariety == "CLMS07"){
+		return false;
+	}
+	
+	//选择币种
+	if(rowIndex == undefined ){
+		var temp = '';
+		var tr = nstc.sf.findParent(obj, "TR");
+		rowIndex = tr.rowIndex - 1; 
+		$("input[id$='_amount.assBankName']").each(function(){
+			var tr = nstc.sf.findParent(this, 'tr');
+			var currencyNo = $(tr).find('select[id$=_amount.currencyNo]').val();
+			var assBankId = $(tr).find('input[id$=_amount.assBankId]').val();
+			if(assBankId == undefined || assBankId == '' || currencyNo == undefined || currencyNo == ''){
+				flag = false;
+			}else{
+				var bankCode = queryParentNo(assBankId);
+				var str = "^"+bankCode+"-"+currencyNo+"^";
+				var index = temp.indexOf(str);
+				if(index == -1){
+					temp = temp + str + ",";
+					flag = false;
+				}else{
+					alert("同一大行,不能选择同一币种!");
+					$('select[id$=_amount.currencyNo]')[rowIndex].value='';
+					flag = true;
+					return;         
+				} 
+			}
+		})
+		
+	}else{
+		//选择银行
+		var temp = '';
+		$("input[id$='_amount.assBankName']").each(function(){
+			var tr = nstc.sf.findParent(this, 'tr');
+			var currencyNo = $(tr).find('select[id$=_amount.currencyNo]').val();
+			var assBankId = $(tr).find('input[id$=_amount.assBankId]').val();
+			
+			if(tr.rowIndex -1 == rowIndex){
+				var assBankId = obj.assBankId;
+			}
+			
+			if(assBankId == undefined || assBankId == '' || currencyNo == undefined || currencyNo == ''){
+				flag = false;
+			}else{
+				var bankCode = queryParentNo(assBankId);
+				var str = "^"+bankCode+"-"+currencyNo+"^";
+				var index = temp.indexOf(str);
+				if(index == -1){
+					temp = temp + str + ",";
+					flag = false;
+				}else{
+					alert("同一大行,不能选择同一币种!");
+					$('input[id$=_amount.assBankName]')[rowIndex].value='';
+					$('input[id$=_amount.assBankId]')[rowIndex].value='';
+					flag = true;
+					return;         
+				} 
+			}
+		})
+	}
+	return flag;
+}
+
+//删除合同金额中多余的数据
+function deleteMoreTr(obj){
+	var temp = $("tr[id$='tableCopy_gdt_yt_amount']");
+	if(temp.length > 1){
+		for ( var int = 1; int < temp.length; int++) {
+			$(temp[int]).remove();
+		}
+	}
+	changeForDelUtil(obj);
+}
+
+//校验授信占用额度
+function checkCreditUseAmount(obj){
+	var tr = nstc.sf.findParent(obj, "TR");
+	var useAmount = $(tr).find("input[id$='.useAmount']").val();
+	var creditBalance = $(tr).find("input[id$='.creditBalance']").val();
+	
+	if(useAmount > creditBalance){
+		alert("占用金额输入不合理,不能大于品种余额!");
+		$(tr).find("input[id$='.useAmount']").val("");
+		return ;
+	}
+}
+
+//校验占比
+function checkOccupy(obj){
+	var tr = nstc.sf.findParent(obj, "TR");
+	var occupy = $(tr).find("input[id$='_amount.occupyProportion']").val();
+	
+	var rate2 = $(obj);
+	if(occupy !='' && occupy != null && occupy != undefined){
+		//rate2.val().excludeNotNumericDot()
+		if(100.0 - parseFloat(occupy)<0){
+			alert("占比不能超过100");
+			$(tr).find("input[id$='_amount.occupyProportion']").val('');
+			return;
+		}
+	}
+}

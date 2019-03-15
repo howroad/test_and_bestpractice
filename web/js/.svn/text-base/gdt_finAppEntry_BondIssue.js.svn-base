@@ -1,0 +1,140 @@
+// 融资申请页面:债券发行--> 添加/查看/修改
+gdt = {}
+
+$(function(){
+	var m = document.getElementById('m').value;
+	
+	//永久债：期限、到期日为非必填
+	if (m != "v") {
+		gdt.changeIssueMethod();
+	}
+	
+	
+	//期限“+”隐藏
+	if(m == "v"){
+		//期限
+		var termDay = $("input[id$='_info.termDay']").val();
+		var termdaySuffix = $("input[id$='_info.termdaySuffix']").val();
+
+		var totalDay = "";
+		if (termdaySuffix == undefined || termdaySuffix == '') {
+			termdaySuffix = 0;
+			totalDay = parseInt(termDay) + parseInt(termdaySuffix);
+		} else if (termdaySuffix == 'N') {
+			totalDay = termDay + "+" + termdaySuffix;
+		} else {
+			totalDay = parseInt(termDay) + parseInt(termdaySuffix);
+		}
+		$("input[id$='_info.termDay']").parent().html(totalDay);
+		$("input[id$='_info.termdaySuffix']").parent().hide();
+	}
+	
+	var bondissueId = $("input[id$='bondissueId']").val();
+	if (bondissueId != '' && m != "v") {
+		var issueMethod = $("select[id$='issueMethod']");
+		issueMethod.hide();
+		issueMethod.parent().html(issueMethod.find("option:selected").text() + issueMethod[0].outerHTML);
+	}
+})
+
+//期间录入校验
+gdt.setTermDay = function(obj){
+	var reg = /^[1-9]\d*$/;
+	if(reg.test(obj.value) || obj.value == ''){
+		gdt.setEndDate();
+	}else{
+		obj.value = "";
+	}
+}
+
+//到期日计算
+gdt.setEndDate = function(){
+	var startDate     = $("input[id$='_info.startDate']").val();
+	var termDay       = $("input[id$='_info.termDay']").val();
+	var termdaySuffix = $("input[id$='_info.termdaySuffix']").val();
+	
+	if(startDate != ""){
+		if (termdaySuffix == 'N') {//永续债
+			//$("input[id$='_info.endDate']").val("");
+		} else {
+			var years = (parseInt(termDay != "" ? termDay : "0") + parseInt(termdaySuffix != "" ? termdaySuffix : "0"));
+			var date  = new Date(Date.parse(startDate.replace(/\-/g, '/')));
+			date.setFullYear(date.getFullYear() + years);
+			$("input[id$='_info.endDate']").val(date.shortDate());
+		}
+	}		
+}
+
+//永久债：到期日为非必填
+gdt.changeIssueMethod = function(){
+	var $termDay = $("input[id$='_info.termDay']");
+	var $termdaySuffix = $("input[id$='_info.termdaySuffix']");
+	var $endDate = $("input[id$='_info.endDate']");
+	var $termDayMark = $("#termDayMark");
+	var $endDateMark = $("#endDateMark");
+	var $issueMethod = $("select[id$='_info.issueMethod']");
+	var selText = $issueMethod.find("option:selected").text();
+	if(selText == "永续债"){
+		//去除必填验证
+		//$termDay.removeAttr("validate");
+		$termDay.removeAttr("validate");
+		$endDate.removeAttr("validate");
+		//隐藏 *
+		//$termDayMark.hide();
+		$termDayMark.hide();
+		$endDateMark.hide();
+		//期限默认为N
+		$termdaySuffix.val("N").hide();
+		$termdaySuffix.parent().html("+N").append($termdaySuffix);
+	}else{
+		//添加必填验证
+		//$termDay.attr("validate", "require|");
+		$termDay.attr("validate", "require|");
+		$endDate.attr("validate", "require|");
+		//显示 *
+		//$termDayMark.show();
+		$termDayMark.show();
+		$endDateMark.show();
+		//期限
+		$termdaySuffix.show();
+		$termdaySuffix.parent().html("+").append($termdaySuffix);
+		if ($termdaySuffix.val() == 'N') {
+			$termdaySuffix.val("");
+		}
+	}
+}
+
+gdt.checkIssueDate = function(){
+	var issueDate = $("input[id$='.issueDate']").val();
+	
+	//发行日期：大于或等于注册通知书的签发日期，小于注册通知书的到期日
+	var bondissueId = $("input[id$='.bondissueId']").val();
+	if (issueDate != '' && bondissueId != '') {
+		var issueDateReg = $("input[id$='.issueDateReg']").val();
+		var endDateReg = $("input[id$='.endDateReg']").val();
+		if(!compareDate(issueDate, endDateReg, '发行日期不能晚于注册通知书的到期日' + endDateReg)){
+			$("input[id$='.issueDate']").val('');
+			return false;
+		}
+		if(!compareDate(issueDateReg, issueDate, '发行日期不能早于注册通知书的签发日期' + issueDateReg)){
+			$("input[id$='.issueDate']").val('');
+			return false;
+		}
+	}
+	
+	//发行日期：大于等于申请日期，小于或等于开始日期
+	var applyDate = $("input[id$='.applyDate']").val();//申请日期
+	var startDate = $("input[id$='.startDate']").val();//开始日/起息日
+	if (applyDate != undefined && applyDate != '') {
+		if(!compareDate(applyDate, issueDate, '发行日期不能早于申请日期' + applyDate)){
+			$("input[id$='.issueDate']").val('');
+			return false;
+		}
+	}
+	if (startDate != undefined && startDate != '') {
+		if(!compareDate(issueDate, startDate, '发行日期不能晚于开始日期' + startDate)){
+			$("input[id$='.issueDate']").val('');
+			return false;
+		}
+	}
+}

@@ -1,0 +1,15 @@
+//到期还款分析表
+$(function(){
+	//金额单位
+	$("select[id$='moneyUnit']").attr('value',$("input[id$='moneyUnit']").val());
+});
+
+
+//修改金额单位 刷新页面 改变金额值
+function setAmountByUnit(obj) {
+	var unit = obj.value;
+	$("input[id='gdt_staticsRepayAnalysis_qry.moneyUnit']").val(unit);
+	var refreshObj = $("input[id='gdt_staticsRepayAnalysis_qry.refresh']")[0];
+	smartForm_doRefresh(refreshObj);
+	$("select[id$='moneyUnit']").attr('value',$("select[id$='moneyUnit']").val());
+}

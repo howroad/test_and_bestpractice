@@ -1,0 +1,89 @@
+// 融资申请页面:信托产品--> 添加/查看/修改
+gdt = {}
+
+$(function(){
+	//信托业保障基金绑定onblur后置任务
+	$('input[id$="_info.feeRate"]').blur(function(){
+		gdt.setFund();
+	})
+	
+	var m = document.getElementById('m').value;
+	//信托业保障基金-总额显示
+	/*if(m != "a"){*/
+		gdt.setFund();
+	/*}*/
+	//实际资金方显示
+	var $realCapital = $('input[id$="_info.realCapital"]');
+	if(m == "v" && $realCapital.val()){
+		$realCapital.closest("span").closest("span")
+		            .html("&nbsp;&nbsp;&nbsp;&nbsp;实际资金方："+$realCapital.val());
+	}	
+	//信托产品
+	var trustType =  $("[id$='_info.trustType']").val();
+	if(trustType == '2'){//集合信托
+		$("[id$='realCapital']").closest("span").hide();
+	}
+})
+
+//计算期间
+gdt.setTermDay = function(){
+	var startDate = $('input[id$="_info.startDate"]').val();
+	var endDate   = $('input[id$="_info.endDate"]').val();
+	var $termDay  = $('input[id$="_info.termDay"]');
+	if(!compareDate(startDate, endDate, '开始日不能晚于到期日')){
+		$('input[id$="_info.endDate"]').val('');
+		$termDay.parent().text("0天").append($termDay.val(0));
+		return false;
+	}
+	if(startDate != '' && endDate != ''){
+		var termDay = DateCompare(startDate,endDate);
+		$termDay.parent().text(termDay+"天").append($termDay.val(termDay));
+	}else{
+		$termDay.parent().text("0天").append($termDay.val(0));
+	}
+}
+
+//实际资金方设置:单一信托录入
+gdt.showRealCapital = function(obj){
+	var selText      = $(obj).find("option:selected").text();
+	var $realCapital = $('input[id$="_info.realCapital"]');
+	var $span        = $realCapital.closest("span");
+	
+	$realCapital.val("");
+	if(selText == "单一信托"){
+		$span.show();
+		$realCapital.attr("validate", "require|");
+	}else{
+		$span.hide();
+		$realCapital.removeAttr("validate");
+	}
+}
+
+//计算信托业保障基金：保障基金比例*合同金额
+gdt.setFund = function(){
+	
+	var feeRate = $('input[id$="_info.feeRate"]').val();
+	var amount  = $('input[id$="_info.amount"]').val();
+
+	if(feeRate && amount){
+		var num1 = feeRate.replace(/,/g, "");
+		var num2 = amount.replace(/,/g, "");
+		var result = accMul(accMul(num1, num2), "0.01");
+		//格式化金额，三位一逗
+//		result = formatMoney(result, 2);
+		$("#totalAmount").text(result);
+	}else {
+		$("#totalAmount").text(0);
+	}
+}
+
+//显示利率调整频率
+gdt.showRateAdjustFrequency = function(obj){
+	$rateAdjustFrequency = $("select[id$='_info.rateAdjustFrequency']");
+	if(obj.value == 2){//固定期限调整显示
+		$rateAdjustFrequency.show();
+	}else{
+		$rateAdjustFrequency.val("").hide();
+	}
+	
+}

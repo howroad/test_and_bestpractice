@@ -1,0 +1,54 @@
+//直接融资》债券
+$(function(obj){
+	/*var bussClass = $("select[id$=.bussClass]").val('CLMS01');*/
+	var bussClass = $("select[id$='.bussClass']").attr('value','CLMS01');
+	doChange(bussClass[0],'add');
+	//隐藏业务品种和分类,展示值
+	/*$("select[id$=.bussVariety]").val("CLMS02");*/
+	$("select[id$='.bussVariety']").attr('value',"CLMS02");
+	var bussVariety = $("select[id$='.bussVariety']");
+	var cltName = $("input[id$='.cltName']").val();
+	var apply = $("input[id$='_form.applyId']").val();
+
+	if(apply != undefined && apply != null && apply != ''){
+		var clt = $("input[id$='_info.cltName']");
+		doHiddenApply(clt);
+		doHidden(bussClass,bussVariety);
+	}
+	
+	var m = document.getElementById('m').value;
+	if(m=='e' || m == 'v' || m == ''){
+		doHidden(bussClass,bussVariety);
+	}
+	if (m != 'v') {
+		setPayInterestInfo();
+	}
+	var channel = $("input[id$='gdt_conBond_form.channel']").val();
+    //当channel字段不为GDEBIT时，将带入的数据置换为不可写
+	if(isNotNull(channel) && channel != "GDEBIT"){
+		var table = $("#gdt_conBond_info");
+		doReadOnly(table);
+	}
+});
+
+
+function setPayInterestInfo() {
+	var payInterestType = $("select[id$='payInterestType']").val();
+	var payInterestFrequencyObj = $("select[id$='payInterestFrequency']");
+	var payInterestDateObj = $("input[id$='payInterestDate']");
+	
+	if (payInterestType == '9') {//起息日对日
+		payInterestFrequencyObj.attr('validate', 'require|').show();
+		if (payInterestFrequencyObj.val() == '') {
+			payInterestFrequencyObj.val('3');
+		}
+	} else {
+		payInterestFrequencyObj.val('').removeAttr('validate').hide();
+	}
+	
+	if (payInterestType == '3' || payInterestType == '4' || payInterestType == '5') {//按季\按半年\按年
+		payInterestDateObj.attr('validate', 'require|').show();
+	} else {
+		payInterestDateObj.val('').removeAttr('validate').hide();
+	}
+}

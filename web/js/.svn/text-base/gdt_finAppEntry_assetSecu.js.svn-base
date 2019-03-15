@@ -1,0 +1,182 @@
+// 融资申请页面:资产证券化--> 添加/查看/修改
+
+$(function(){
+	var m = document.getElementById('m').value;
+	//动态显示融资分类,融资品种
+	var pageCode = $("input[id='pageCode']").val();
+	var bussClass = document.getElementById(pageCode + '_info.bussClass');
+	var bussVariety = document.getElementById(pageCode + '_info.bussVariety');
+	//资产证券化
+	bussClass.value="CLMS01";
+	bussVariety.value="CLMS28";
+	if(m=='a') queryBussVariety(bussClass,bussVariety);	
+	$("select[id$=.bussVariety]").val("CLMS28");
+	
+	//隐藏付息方式-其他输入框
+	var payInterestType = $("select[id$='_info.payInterestType']").val();
+	if(payInterestType != 7){
+		$("input[id$='_info.payInterestTypeOther']").hide();
+	}
+	//隐藏产品类型-其他输入框
+	var productType = $("select[id$='_info.productType']").val();
+	if(productType != 3){
+		$("input[id$='_info.productName']").hide();
+	}
+	//隐藏发行方式-其他输入框
+	var distributionType = $("select[id$='_info.distributionType']").val();
+	if(distributionType != 2){
+		$("input[id$='_info.distributionName']").hide();
+	}
+	//隐藏监管机构-其他输入框
+	var regulatoryAgency = $("select[id$='_info.regulatoryAgency']").val();
+	if(regulatoryAgency != 3){
+		$("input[id$='_info.regulatoryAgencyOther']").hide();
+	}
+	//隐藏交易场所-其他输入框
+	var tradingPlace = $("select[id$='_info.tradingPlace']").val();
+	if(tradingPlace != 5){
+		$("input[id$='_info.tradingPlaceOther']").hide();
+	}
+
+	//票面利率
+	$("input[id$='rate']").removeAttr('validate');
+	
+	//计息方式
+	$("select[id='gdt_product.rateAdjustType']").each(function() {
+		$(this).change();
+	});
+})
+
+gdt = {}
+/**
+ * 显示交易场所输入框
+ */
+gdt.showTradingPlace = function(obj){
+	var tradingPlace = obj.value;
+	var $tradingPlaceOther = $("input[id$='_info.tradingPlaceOther']");
+	if(tradingPlace == 5){
+		$tradingPlaceOther.show();
+	}else{
+		$tradingPlaceOther.hide().val("");
+	}
+	
+}
+/**
+ * 显示产品类型输入框
+ */
+gdt.showProductType = function(obj){
+	var productType = obj.value;
+	var $productName = $("input[id$='_info.productName']");
+	if(productType == 3){
+		$productName.show();
+	}else{
+		$productName.hide().val("");
+	}
+	
+}
+/**
+ * 显示监管机构输入框
+ */
+gdt.showRegulatoryAgency = function(obj){
+	var regulatoryAgency = obj.value;
+	var $regulatoryAgencyOther = $("input[id$='_info.regulatoryAgencyOther']");
+	if(regulatoryAgency == 3){
+		$regulatoryAgencyOther.show();
+	}else{
+		$regulatoryAgencyOther.hide().val("");
+	}
+	
+}
+/**
+ * 显示发行方式输入框
+ */
+gdt.showDistributionType = function(obj){
+	var distributionType = obj.value;
+	var $distributionName = $("input[id$='_info.distributionName']");
+	if(distributionType == 2){
+		$distributionName.show();
+	}else{
+		$distributionName.hide().val("");
+	}
+	
+}
+/**
+ * 产品删除按钮
+ */
+function doDelProduct(obj){
+	var list=$('div[id$="_product"]');
+	var checks=list.find('input[id$="_check"]:checked');
+	if(checks==undefined || checks.length==0){
+		alert("至少选择一条数据");
+		return;
+	}
+	$(checks).each(function(){
+		nstc.sf.delCurrRow(this)
+	});
+	changeBondInfo();
+}
+//删除新增的产品
+function doDelProduct4Add(obj) {
+	nstc.sf.delCurrRow(obj);
+	changeBondInfo();
+}
+
+//新增产品信息
+function doAddProduct(obj) {
+	var tr_row = smartForm_add(obj);
+	var tr = $(tr_row);
+	var button = tr.find("input[class='buttonX button32']");
+	button.bind('click',doDelProduct4Add);
+}
+
+
+//新增投资
+function doAddFinancier(obj) {
+	var prodectList = $("input[id='gdt_product.bondShortName']:visible");
+	if (prodectList.length < 1) {
+		alert("请先录入产品信息");
+		return;
+	}
+	for(var i = 0; i < prodectList.length; i++) {
+		var bondShortName = prodectList.eq(i).val();
+		if ($.trim(bondShortName) == '') {
+			alert("产品信息的证券简称不能为空");
+			return;
+		}
+	}
+	
+	var tr_row = smartForm_add(obj);
+	var tr_Fin = $(tr_row);
+	var bondShortNameObj = tr_Fin.find("select[id$='.bondShortName']").get(0);
+	bondShortNameObj.innerHTML = '';
+	for(var i = 0; i < prodectList.length; i++) {
+		var tr = prodectList.eq(i).parents("tr").first();
+		var bondShortName = tr.find("input[id$='.bondShortName']").val();
+		bondShortNameObj[i] = new Option(bondShortName, bondShortName);
+	}
+}
+
+//修改产品信息的证券简称
+function changeBondInfo(obj) {
+	var html = "";
+	//产品信息
+	var prodectList = $("input[id='gdt_product.bondShortName']:visible");
+	if (prodectList.length > 0) {
+		for(var i = 0; i < prodectList.length; i++) {
+			var tr = prodectList.eq(i).parents("tr").first();
+			var bondShortName = tr.find("input[id$='.bondShortName']").val();
+			html += "<option value='" + bondShortName + "'>" + bondShortName + "</option>";
+		}
+	} else {
+		html += "<option></option>";
+	}
+	
+	//投资人
+	var financierList = $("select[id='gdt_financier.bondShortName']:visible");
+	for(var i = 0; i < financierList.length; i++) {
+		var tr = financierList.eq(i).parents("tr").first();
+		var bondShortNameObj = tr.find("select[id$='.bondShortName']");
+		var bondShortName = bondShortNameObj.val();
+		bondShortNameObj.html(html).val(bondShortName);
+	}
+}

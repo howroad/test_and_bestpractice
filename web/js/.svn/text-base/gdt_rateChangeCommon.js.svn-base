@@ -1,0 +1,333 @@
+$(function(){
+	$("input[id$='.rateAdjustType']").each(function(){
+		var rateAdjustType = this.value;
+		if (rateAdjustType != '3') {//手动调整
+			var tr = $(this).parents("tr").first();
+			var rate = tr.find("input[id$='rate']").val();
+			var baseRate = tr.find("input[id$='baseRate']").val();
+			//基准利率
+			tr.find("input[id$='rate']").hide();
+			if (rate != '') {
+				rate = FormatMoney(rate, 6)
+			}
+			setInfo4InputAndSpan(tr, 'rate', rate, rate);
+			//年利率
+			tr.find("input[id$='baseRate']").hide();
+			if (baseRate != '') {
+				baseRate = FormatMoney(baseRate, 6)
+			}
+			setInfo4InputAndSpan(tr, 'baseRate', baseRate, baseRate, 6);
+			//隐藏按钮
+			tr.find("input[id$='queryNewLoanRate']").hide();
+		}
+	});
+})
+
+//点击确定操作
+function smartForm_confirm_true(){
+	//$("#父窗口元素ID",window.parent.document);
+	var objbut = top.Layer.getWin().document.getElementById("gdt_rateChange_qry.refresh");
+	var objbut2 = top.Layer.getWin().document.getElementById("gdt_umRateChange_qry.refresh");
+	if(objbut){
+		objbut.click();
+		windowClose();
+	}
+	if(objbut2){
+		objbut2.click();
+		windowClose();
+	}
+}
+function smartForm_confirm(msg) {
+	alert(msg);
+	smartForm_confirm_true();
+}
+
+function showRateChange(contractId, fmId){
+	var url = "GDEBIT@gdt_rateChangePage.sf?m=e";
+
+	//校验是否在工作流中
+	var result = validateInFlow('GDEBIT_FM008',contractId);
+	if(result != '' && result != null && result != undefined){
+		alert(result);
+		return;
+	}
+	if (fmId != '') {
+		contractId = ''
+	}
+	url = url + "&contractId=" + contractId + "&fmId=" + fmId;
+	openwin(url, '利率变更', 1200, 650);
+}
+
+//校验基本利率
+function checkListBaseRate(obj){
+	var rate = $(obj);
+	if(rate.val() !=''){
+		if(100.0-parseFloat(rate.val().excludeNotNumericDot())<0){
+			alert("利率值不能超过100");
+			rate.val('');
+			return;
+		}
+	}
+	
+	var tr = nstc.sf.findParent(obj, "TR");
+	//获取利率浮动方式
+	var floatType = $(tr).find("input[id$='.floatType']").val();
+	var rate = $(tr).find("input[id$='.rate']").val();
+	var floatValue = $(tr).find("input[id$='.floatValue']").val();
+	var baseRate = $(tr).find("input[id$='.baseRate']").val();
+
+	rate = countRate(baseRate,floatType,floatValue);
+	if(parseFloat(rate) < parseFloat(0.0)){
+		rate = '';
+		alert("利率值不合法!利率小于0");
+	}
+	if(parseFloat(rate) > parseFloat(100.0)){
+		rate = '';
+		alert("利率值不合法!利率大于100");
+	}
+	$(tr).find("input[id$='.rate']").val(rate);
+	$("input[id$='_acc.rate']").val(rate);
+}
+
+
+//校验利率
+function checkRate(obj){
+	var rate=$(obj);
+	if(rate.val() !=''){
+		if(100.0 - parseFloat(rate.val().excludeNotNumericDot())<0){
+			alert("利率值不能超过100");
+			rate.val('');
+			return;
+		}
+	}
+	
+}
+
+function countRate(baseRate,floatType,floatValue){
+	var rate = '';
+	if(baseRate=='' || baseRate == undefined){
+		return rate;
+	}
+	
+	if(floatType != 2){
+		if(floatValue=='' || floatValue == undefined){
+			return rate;
+		}
+	}else{
+		rate = baseRate;
+	}
+	
+	baseRate = parseFloat(baseRate);
+	floatValue = parseFloat(floatValue);
+	
+	//上浮
+	if(floatType==0){
+		rate = FormatNumber(baseRate*(1+floatValue*1/100), 6);
+	//下浮
+	}else if(floatType==1) {
+		rate = FormatNumber(baseRate*(1-floatValue*1/100), 6);
+	//不变
+	}else if(floatType==3) {
+		rate = FormatNumber(baseRate+(floatValue*0.01), 6);
+	//减点			 
+	}else if(floatType==4){
+		rate = FormatNumber(baseRate-(floatValue*0.01), 6);
+	}
+	rate = FormatNumber(rate,6)
+	return rate;
+}
+
+//变更
+function doSubmitRateChange(obj) {
+	var changeFlag = false;
+	$("input[id$='.rate']").each(function() {
+		var tr = $(this).parents("tr").first();
+		var rate = this.value;
+		var formerRate = tr.find("input[id$='.formerRate']").val();
+		if (rate == '' || formerRate == undefined) {
+			return true;//true执行下一条，false跳出
+		}
+		if (parseFloat(rate) != parseFloat(formerRate)) {
+			changeFlag = true;
+			return false;
+		}
+	});
+	if (!changeFlag) {
+		alert("请修改年利率后再变更");
+		return;
+	}
+	
+	//校验到期日
+	var effectDate = $("input[id='gdt_rateChange_reason.effectDate']").val();
+	var okFlag = true;
+	var startDate = "";//合同开始日
+	var endDate = "";//合同到期日
+	var startDateList = $("input[id='gdt_rateChange_conAmount.startDate']");
+	for (var i = 0; i < startDateList.length; i++) {
+		var startDateObj = startDateList.eq(i);
+		startDate = startDateObj.val();
+		if (startDate != '') {
+			var tr_s = startDateObj.parents("tr").first();
+			endDate = tr_s.find("input[id$='.endDate']").val();;
+			break;
+		}
+	}
+	
+	//合同利率修改校验到期日
+	$("input[id$='gdt_rateChange_amount.rate']").each(function() {
+		var tr = $(this).parents("tr").first();
+		var rate = this.value;
+		var formerRate = tr.find("input[id$='.formerRate']").val();
+		
+		if (rate == '' || formerRate == undefined) {
+			return true;//true执行下一条，false跳出
+		}
+		if (parseFloat(rate) != parseFloat(formerRate) ) {
+			if (dateDiff(startDate, effectDate) < 0) {
+				okFlag = false;
+				alert("合同利率变更：生效日期" + effectDate + "不能早于合同开始日" + startDate);
+				return false;
+			} else if (dateDiff(effectDate, endDate) < 0) {
+				okFlag = false;
+				alert("合同利率变更：生效日期" + effectDate + "不能晚于合同到期日" + endDate);
+				return false;
+			}
+		}
+	});
+	
+	//提款利率修改校验到期日
+	$("input[id$='gdt_rateChange_fetch.rate']").each(function() {
+		var tr = $(this).parents("tr").first();
+		var rate = this.value;
+		var formerRate = tr.find("input[id$='.formerRate']").val();
+		var arriAcntDate = tr.find("input[id$='.arriAcntDate']").val();//提款到账日
+		var dueDate = tr.find("input[id$='.dueDate']").val();//到期日
+		if (rate == '' || formerRate == undefined) {
+			return true;//true执行下一条，false跳出
+		}
+		if (parseFloat(rate) != parseFloat(formerRate) ) {
+			if (dateDiff(arriAcntDate, effectDate) < 0) {
+				okFlag = false;
+				alert("提款利率变更：生效日期" + effectDate + "不能早于提款到账日" + arriAcntDate);
+				return false;
+			} else if (dateDiff(effectDate, dueDate) < 0) {
+				okFlag = false;
+				alert("提款利率变更：生效日期" + effectDate + "不能晚于提款到期日" + dueDate);
+				return false;
+			}
+		}
+	});
+	if (!okFlag) {
+		return;
+	}
+
+	smartForm_doSubmit(obj);
+}
+
+/**
+ * 查询最新利率
+ * rateType：0合同；2提款；
+*/
+function queryNewLoanRate(obj, rateType) {
+	
+	var tr = $(obj).parents("tr").first();
+	var currencyNo = tr.find("input[id$='.currencyNo']").val();
+	var bankNo = tr.find("input[id$='.bankNo']").val();
+	
+	var startDate = "";//合同开始日/提款到账日
+	var endDate = "";//合同到期日
+	var termDay = "";//融入期限
+	var termType = "";//期限类型
+	var isLibor ;
+	var rateTermKind;
+	if (rateType == '0') {
+		var startDateList = $("input[id='gdt_rateChange_conAmount.startDate']");
+		for ( var i = 0; i < startDateList.length; i++) {
+			var startDateObj = startDateList.eq(i);
+			startDate = startDateObj.val();
+			if (startDate != '') {
+				var tr_s = startDateObj.parents("tr").first();
+				endDate = tr_s.find("input[id$='.endDate']").val();;
+				break;
+			}
+		}
+		if (startDate == '' || endDate == '' || currencyNo == '') {
+			return;
+		}
+	} else {
+		startDate = tr.find("input[id$='.arriAcntDate']").val();
+		termDay = tr.find("input[id$='.financeTerms']").val();
+		termType = tr.find("input[id$='.financeUnit']").val();
+		if (termDay == '' || termType == '') {
+			return;
+		}
+	}
+	isLibor = tr.find("[id$='.isLibor']").val();
+	rateTermKind= tr.find("[id$='.rateTermKind']").val();
+	if(currencyNo != 'CNY' && (bankNo == '' || bankNo == undefined)) {
+		return;
+	}
+	var baseRate = tr.find("input[id$='.baseRate']");
+	if(isLibor!=1){
+	
+	$.ajax({
+		type: 'POST',
+		url: "GDEBIT@QueryLoanRateAction.sf",
+		async : false,
+		data: {'startDate':startDate, 'endDate':endDate, 'currencyNo':currencyNo, 'bankNo':bankNo, 
+			'termDay': termDay, 'termType':termType,'rateTermKind':rateTermKind},
+		dataType:'json',
+		success: function(data) {
+			if (data == '') {
+				alert("请先维护" + startDate + "日之前生效的融资基准利率【" + rateKindName + "/" + currencyName + "】");
+			} else {
+				var active = data[0].active;
+				var rateKindName = data[0].rateKindName;
+				var rateValue = data[0].rateValue;
+				if(active == '0') {
+					alert("请先维护" + startDate + "日之前生效的融资基准利率【" + rateKindName + "/" + currencyName + "】");
+				} else if (active == '1') {
+					alert(data[0].msg);
+				}else {
+					baseRate.val(FormatNumber(rateValue, 6)).change();
+				}
+			}
+		}
+	});
+	}else if(isLibor==1){
+		var liborRate;
+		$.ajax({
+			type: 'POST',
+			url: "GDEBIT@QueryLiborRateAction.sf",
+			async : false,
+			data: {'termDay':termDay, 'termDayType':termType, 'startDate':startDate,'currencyNo':currencyNo,'rateTermKind':rateTermKind},
+			dataType:'json',
+			success: function(data) {
+				if (data == '') {
+					alert("请先维护" + startDate + "日之前的Libor利率【" + currencyName +"】");
+					return;
+				} else {
+					var active = data[0].active;
+					liborRate = data[0].liborRate;
+					var rateKind = data[0].rateKind;
+					var rateTermKindTemp= data[0].rateTermKind;
+					//rateTermKinds.val(rateTermKindTemp);
+					if(active == '0') {
+						alert("请先维护" + startDate + "日之前生效的Libor准利率【" + rateKind +currencyName+"】");
+						return;
+					} else if (active == '1') {
+						alert(data[0].msg);
+					}else {
+						//baseRate.val(FormatNumber(liborRate, 6)).change();
+						if(liborRate!=null){
+							baseRate.val(FormatNumber(liborRate, 6)).change();
+						}else{
+							baseRate.val("").change();
+						}
+					}
+				}
+			}
+		});	
+	}
+
+}

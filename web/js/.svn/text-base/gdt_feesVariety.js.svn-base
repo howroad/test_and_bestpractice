@@ -1,0 +1,22 @@
+//费用种类设置
+$(function(){
+	var isUpdated = $('[id="gdt_feesVariety_list.isUpdated"]');
+	for (var i = 0;i < isUpdated.length;i++){
+		//如果不可改，就将该行费用品种编号和备注不可修改
+		//目前只有担保费用需要此操作
+		if($(isUpdated[i]).val() != '' &&  $(isUpdated[i]).val() == 1){
+			var tr = $(isUpdated[i]).parent().parent().parent();
+			changeInput('feesVarietyNo',tr);
+			changeInput('memo',tr);
+			$(tr).find("[id='gdt_feesVariety_list._check']").parent().html("");
+		}
+	} 
+})
+//录入框改为文本框
+function changeInput(obj,tr){
+	var no = $(tr).find('[id$='+obj+']');
+	var noVal = no.val();
+	var objHtml = $(tr).find("[id$=."+obj+"]").parent().html();
+	no.parent().html("<span>"+noVal+"</span><span style='display:none'>"+objHtml+"</span>");
+
+}

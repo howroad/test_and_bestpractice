@@ -1,0 +1,110 @@
+$(function() {
+	var tab = $("div[id^='gdt_mergeBondIssue_list'] table");
+	updateTotal(tab);
+	addSummerTotal(tab);
+});
+
+/** 将smartPage的合计改为总计 */
+function updateTotal(tab) {
+	var periodNum = tab.find("input[id='gdt_mergeBondIssue_list.periodNum']").size()-1;
+	var tr = tab.find("tr[id^='tableTotal']");
+	tr.find("td[id^='gdt_mergeBondIssue_list.periodNum']").val(periodNum);
+	tr.find("td[id^='gdt_mergeBondIssue_list.periodNum']").html(periodNum);
+	tr.find("th").html("总计");
+}
+
+/** 新增合计行 */
+function addSummerTotal(tab) {
+	var tabSubTotal = tab.find("tr[id^='tableSubTotal']");
+	var arr = new Array();
+	tabSubTotal.each(function() {
+		var map = new Object();
+		var issuance = $(this).prev().find("td:first input[id$='issuance']").val();
+		map.key = issuance;
+		map.value = $(this);
+		arr.push(map);
+	});
+	for(var i = 0; i< arr.length;i++) {
+		if(i < arr.length -1 && arr[i].key != arr[i+1].key) {
+			$(arr[i].value).after(trHtm(arr[i].key,tab));
+		} 
+		if(i == arr.length -1) {
+			$(arr[i].value).after(trHtm(arr[i].key,tab));
+		}
+	}
+}
+
+/** 拼接html代码 */
+function trHtm(key,tab) {
+	var html = "<tr id='tableSummerTotal' class='table_sub_total'>"
+			+"<th class='th_width_120 text-right table_height' nowrap='nowrap' colspan='2'>合计</th>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='vertical-align:middle;padding:0 5px 0 5px;' align='left'>"+getPeriodNum(key,tab)+"</td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'>"+getAmount(key,tab,"arriAcntAmountCNY")+"</td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'>"+getAmount(key,tab,"honourAmountCNY")+"</td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'></td>"
+			+"<td valign='middle' nowrap='nowrap' colspan='1' style='font-weight:bold;padding:0 5px 0 5px;' align='right'>"+getAmount(key,tab,"unHonourAmountCNY")+"</td>"
+			+"</tr>";
+	return html;
+}
+
+/** 期数合计 */
+function getPeriodNum(key,tab) {
+	var inp = tab.find("tr input[id$='issuance']");
+	var total = 0;
+	inp.each(function() {
+		if(key == $(this).val()) {
+			total += 1;
+		}
+	});
+	return total;
+}
+
+/** 金额合计 */
+function getAmount(key,tab,id) {
+	var inp = tab.find("tr input[id$='issuance']");
+	var total = 0;
+	inp.each(function() {
+		var tr = $(this).parents("tr:first");
+		var amount = tr.find("input[id$="+id+"]").val();
+		amount = parseFloat(amount.replace(/,/g,''));
+		if(key == $(this).val()) {
+			total += amount;
+		}
+	});
+	return FormatMoney(total,2);
+}
+
+/** 刷新页面 */
+function doRefresh(obj) {
+	var dueDateStart = $("input[id$='dueDateStart']").val();
+	var dueDateEnd = $("input[id$='dueDateEnd']").val();
+	var arriAcntAmountStart = $("input[id$='arriAcntAmountStart']").val();
+	arriAcntAmountStart = parseFloat(arriAcntAmountStart.replace(/,/g,''));
+	var arriAcntAmountEnd = $("input[id$='arriAcntAmountEnd']").val();
+	arriAcntAmountEnd = parseFloat(arriAcntAmountEnd.replace(/,/g,''));
+	if (arriAcntAmountStart > arriAcntAmountEnd) {
+		alert("发行额开始额度不能大于结束额度");
+		return;
+	}
+	if (compareDate(dueDateStart,dueDateEnd) < 0) {
+		alert("到期日开始日期不能大于结束日期");
+		return;
+	}
+	smartForm_doRefresh(obj);
+}
+
+/** 期限校验 */
+function validateTerm(obj) {
+	var term = $(obj).val();
+	if(term != "" && !/^[0-9]*[1-9][0-9]*$/.test(term)) {
+		alert("请输入有效数字！");
+		$(obj).val("");
+	}
+}

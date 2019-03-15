@@ -1,0 +1,424 @@
+//放还款计划管理
+$(function (){
+	//根据planType显示对应的域
+	$("[id$='.planType']").each(function() {
+		setInfoByPlanType(this);
+	});
+	$("div[id$=gdt_ledgerPlanPay_list]").hide();
+	$("div[id$=gdt_ledgerPlanPay_list2]").hide();
+	var planChange = $("[id$='isLedgerPlanChange']");
+	for(var i = 0;i < planChange.length;i++){
+		if(planChange[i].checked && planChange[i].value == 1){
+			$("div[id$=gdt_ledgerPlanPay_list]").show();
+			$("div[id$=gdt_ledgerPlanPay_list2]").show();
+		}
+	}
+	//计算天数
+	$("input[id$='.startDate']").each(function() {
+		setPlanTermDay(this);
+	});
+	//还本付息计划
+	var m = document.getElementById('m').value;
+	if(m != null && m == 'e'){
+		$("input[id$='.executeState']").each(function(){
+			if (this.value == '1') {//已执行
+				var tr = $(this).parents("tr").first();
+				//已执行的不能删除
+				tr.find("input[id$='_check']").remove();
+				//已执行的不能修改
+				hideLedgerPlan(this);
+			}
+		});
+	}
+	//合同修正 内容修正不显示还款变更计划
+	var changeType = $("[id$='_form.changeType']").val();
+	var changeType1 = $("[id$='_form1.changeType']").val();//详情页面
+	if(changeType == '1'){
+		$("div[id$=gdt_ledgerPlanPay_choose]").hide();
+	}
+	if(changeType1 == '1'){//详情页面
+		$("div[id$=gdt_contractAmeLook_planPay]").hide();
+	}
+	var fetchNo = $("[id$='fetchNo']");
+	for(var i = 0 ;i < fetchNo.length; i++){
+		if($(fetchNo[i]).val() != null && $(fetchNo[i]).val() != ''){
+			var html = $(fetchNo[i]).html();
+			$(fetchNo[i]).parent().html($(fetchNo[i]).val()).append($(fetchNo[i]));
+			$(fetchNo[i]).hide();
+			$(fetchNo[i]).html(html);
+		}
+	}
+//	计算剩余还本金额
+	countLeftPlanAmount4All();
+	var bussVariety = $("[id$='form.bussVariety']").val();
+	if(bussVariety == 'CLMS10'){
+		$("[id$='gdt_ledgerPlanPay_list2.assBankName']").val($("[id$='info.assBankName']").val());
+		$("[id$='gdt_ledgerPlanPay_list2.assBankId']").val($("[id$='info.assBankId']").val());
+		$("[id$='gdt_ledgerPlanPay_list2.currencyNo']").val($("[id$='info.currencyNo']").val());
+		var assBankId = $("[id$='gdt_ledgerPlanPay_list2.assBankId']");
+		for(var i = 0;i < assBankId.length;i++){
+//			if($(assBankId[i]).val() != null && $(assBankId[i]).val() != ''){
+				tr = $(assBankId[i]).parents("tr").first();
+				hideInput(tr, 'assBankId', 'select');
+				hideInput(tr, 'currencyNo', 'select');
+//			}
+		}
+//		var currencyNo = $("[id$='gdt_ledgerPlanPay_list2.currencyNo']");
+//		for(var i = 0;i < currencyNo.length;i++){
+//			if($(currencyNo[i]).val() != null && $(currencyNo[i]).val() != ''){
+//				tr = $(currencyNo[i]).parents("tr").first();
+//			}
+//		}
+	}
+});
+
+function doSave(obj) {
+	var list = $("input[id='gdt_ledgerPlanPay_list.planId']");
+	if (list.length < 2) {
+		alert("请先新增还本付息计划再保存");
+		return;
+	}
+	smartForm_doSave(obj);
+}
+
+//删除
+function delLedgerPlan(obj, flag) {
+	var planList = $("input[id='gdt_ledgerPlanPay_list._check']:checked");
+	if (planList.length < 1) {
+		alert("至少勾选一条数据");
+		return;
+	}
+	smartForm_doDelete(obj);
+}
+
+//修改还本方式
+function changePlayType(obj) {
+	var planType = obj.value;//1还本，2付息，5还款
+	var tr = $(obj).parents("tr").first();
+	var code = '';//编号编码
+	var planNo = '';//计划ID
+	if (planType == '2') {//付息
+		code = 'FX';
+		planNo = tr.find("input[id$='.planNo_FX']").val();
+	} else if(planType == '1'){//1还本，5还款
+		code = 'HB';
+		planNo = tr.find("input[id$='.planNo_HB']").val();
+	}else{
+		code = 'FK';
+		planNo = tr.find("input[id$='.planNo_FK']").val();
+	}
+	if (planNo == '') {
+		planNo = querySerialNumber(code);//计划ID
+	}
+	if (planType == '2') {//付息
+		tr.find("input[id$='.planNo_FX']").val(planNo);
+	} else if(planType == '1') {//1还本，5还款
+		tr.find("input[id$='.planNo_HB']").val(planNo);
+	}else{
+		tr.find("input[id$='.planNo_FK']").val(planNo);
+	}
+	if(planType == '4'){//付款
+		tr.find("[id$='currencyNo']").val($("input[id$='_info.currencyNo']").val());
+		tr.find("[id$='assBankId']").val($("input[id$='_info.assBankId']").val());
+	}
+		
+	setInfoByPlanType(obj);
+	
+	setInfo4InputAndSpan(tr, 'planNo', planNo, planNo);
+	
+	//计算剩余还本金额
+	countLeftPlanAmount4All();
+}
+
+function setInfoByPlanType(obj) {
+	var tr = $(obj).parents("tr").first();
+	var planType = tr.find("[id$='.planType']").val();;//1还本，2付息
+	if (planType == '2'){//付息
+		tr.find("input[id$='.startDate']").attr('validate', 'require|').show();
+		tr.find("input[id$='.endDate']").attr('validate', 'require|').show();
+		tr.find("input[id$='.interest']").show();//.attr('validate', 'require|')
+		tr.find("input[id$='.rate']").show();//.attr('validate', 'require|')
+	} else {//1还本，5还款
+		tr.find("input[id$='.startDate']").val('').removeAttr('validate').hide();
+		tr.find("input[id$='.endDate']").val('').removeAttr('validate').hide();
+		setInfo4InputAndSpan(tr, 'dayCount', '', '');
+		tr.find("input[id$='.interest']").val('').removeAttr('validate').hide();
+		tr.find("input[id$='.rate']").val('').removeAttr('validate').hide();
+	}
+}
+
+//计算计息天数
+function setPlanTermDay(obj) {
+	var tr = $(obj).parents("tr").first();
+	var startDate = tr.find("input[id$='.startDate']").val();
+	var endDate = tr.find("input[id$='.endDate']").val();
+	var dayCount = '';
+	if(startDate != null && endDate != null ){
+		if(!compareDate(startDate, endDate, '开始日不能晚于到期日')){
+			tr.find("input[id$='.endDate']").val('');
+			setInfo4InputAndSpan(tr, 'dayCount', '', '');
+			return false;
+		}
+		if (startDate != '' && endDate != '') {
+			dayCount = dateDiff(startDate, endDate) + 1;
+		}
+	}
+	setInfo4InputAndSpan(tr, 'dayCount', dayCount, dayCount);
+	return true;
+}
+
+/**
+ * 计算利息
+ * @param obj
+ */
+function calInterest(obj){
+	var tr = $(obj).parents('tr').first();
+	var interest = tr.find("input[id$='interest']").val();//计息金额
+	if(interest != null && interest != '') {
+		if(parseFloat(interest.excludeNotNumericDot()) < 0){
+			alert("计息金额必须大于0");
+			interest.val('');
+			return;
+		}
+		
+	}
+	if(checkPlanRate(obj)){
+		//利息=金额*（计息截止日-计息开始日）*利率/365(取计息基数的值)
+		var interestAccDay = $("input[id$='_info.interestAccDay']").val();
+		if(interestAccDay == null || interestAccDay == ''){
+			interestAccDay = "360";
+		}
+		var startDate = tr.find('input[id$=".startDate"]').val();
+		var endDate = tr.find('input[id$=".endDate"]').val();
+		var rate = tr.find('input[id$=".rate"]').val().excludeNotNumericDot();
+		var planAmountObj = tr.find('input[id$=".planAmount"]');//利息
+		var interest = tr.find("input[id$='.interest']").val().excludeNotNumericDot();//计息金额
+
+		//校验日期
+		if (!setPlanTermDay(obj)) {
+			return false;
+		}
+		
+		if(startDate != null && endDate != null && startDate != '' && endDate != '' && rate != '' && interest != ''){
+			var planAmountVal = interest * dateDiff(startDate, endDate) * rate / interestAccDay / 100;
+			if(planAmountVal <= 0.001){
+				planAmountObj.val('0.00');
+			} else {
+				planAmountObj.val(FormatMoney(planAmountVal, 2));
+			}
+		}/*else{
+			planAmountObj.val('');
+		}*/
+	}
+}
+
+/**
+ * 校验利率
+ * @param obj
+ * @returns {Boolean}
+ */
+function checkPlanRate(obj){
+	var rate = $(obj).parents('tr').first().find("input[id$='rate']");
+	var rateVal = rate.val().excludeNotNumericDot()
+	if(rateVal != undefined && rateVal != ''){
+		if(100.0 - parseFloat(rateVal) < 0){
+			alert("利率值不能超过100");
+			rate.val('');
+			return false;
+		} else if(parseFloat(rateVal) <= 0){
+			alert("利率值必须大于0");
+			rate.val('');
+			return false;
+		}
+	}
+	return true;
+}
+
+//不可编辑
+function hideInput(tr, id, type) {
+	var obj = tr.find("[id$='" + id + "']");
+	var value;
+	var html;
+	if (type == 'select') {
+		value = obj.find(" option:selected").text();
+		html = obj.html();
+	} else {
+		value = obj.val();
+	}
+	obj.hide().parent().html(value).append(obj);
+	
+	if (type == 'select') {
+		obj.html(html);
+	}
+}
+
+//隐藏还本付息计划
+function hideLedgerPlan(obj) {
+	if (obj.value != '1') {//1已执行
+		return true;
+	}
+	var ids = ['planType','fetchNo','actDate', 'planAmount', 'interest', 'startDate', 'endDate', 'rate', 'memo'];
+	var types = ['select','select','', '', '', '', '', '', ''];
+	var tr = $(obj).parents("tr").first();
+	for (var i = 0; i < ids.length; i++) {
+		hideInput(tr, ids[i], types[i]);
+	}
+	/*$("input[id='gdt_ledgerPlan4Repay_list.planId']").each(function(){
+	});*/
+}
+
+//计算剩余还本金额
+function countLeftPlanAmount4All() {
+	var fetchNoArr = new Array();
+	var fetchMoneyArr = new Array();
+	var planId = new Array();
+	var fetchNo = $("[id$='fetchNo']");
+	
+	var k = 0;
+	for(var i = 0 ;i < fetchNo.length ;i++){
+		var flag = true;
+		for(var j = 0 ;j <= k;j++){
+			if($(fetchNo[i]).val() == fetchNoArr[j]){
+				flag = false;
+				break;
+			}
+		}
+		if(flag){
+			fetchNoArr[k] = $(fetchNo[i]).val();
+			tr = $(fetchNo[i]).parents("tr").first();
+			fetchMoneyArr[k] = tr.find("[id$='fetchAmount']").val();
+			k++;
+		}
+	}
+	for(var j = 0 ;j <= k;j++){
+		planId[j] = new Array();
+		var l = 0;
+		for(var i = 0 ;i < fetchNo.length ;i++){
+			var tr = $(fetchNo[i]).parents("tr").first();
+			if($(fetchNo[i]).val() == fetchNoArr[j]){
+				planId[j][l] = tr.find("[id$='planId']");
+				l++;
+			}
+		}
+	}
+	for(var j = 0 ;j <= k;j++){
+		for(var i = 0 ;i < fetchNo.length ;i++){
+			var tr = $(fetchNo[i]).parents("tr").first();
+			if($(fetchNo[i]).val() == fetchNoArr[j]){
+				countLeftPlanAmount(tr,fetchMoneyArr[j],planId[j]);
+			}
+		}
+		
+	}
+	
+//	$("input[id='gdt_ledgerPlanPay_list.planId']").each(function(){
+//		countLeftPlanAmount(this,'gdt_ledgerPlanPay_list');
+//	});
+//	var planId = $("input[id='gdt_contractAmeLook_planPay.planId']");
+//	if(planId != null && planId.length > 0){
+//		planId.each(function(){
+//			countLeftPlanAmount(this,'gdt_contractAmeLook_planPay');
+//		});
+//	}
+}
+
+function countLeftPlanAmount(tr,fetchAmount,list) {
+	//var tr = $(obj).parents("tr").first();
+	var leftPlanAmountObj = tr.find("input[id$='leftPlanAmount']");
+//	var fetchAmount;//提款金额
+//	var fetchAmountList = $("input[id='"+str+".fetchAmount']");
+//	for(var i = 0; i < fetchAmountList.length; i++) {
+//		fetchAmount = fetchAmountList.eq(i).val();
+//		if (fetchAmount != '') {
+			fetchAmount = fetchAmount.excludeNotNumericDot();
+//			break;
+//		}
+//	}
+
+	var leftPlanAmount = fetchAmount;//剩余还款金额
+	var planType = tr.find("[id$='planType']").val();
+	var actDate = tr.find("input[id$='actDate']").val();
+	var planAmount = tr.find("input[id$='planAmount']").val();
+	if(planType != '1' || planAmount == '') {//1:还本
+		leftPlanAmountObj.parent().html('').append(leftPlanAmountObj);
+		return;
+	}
+	
+//	var list1 = $("input[id='gdt_ledgerPlanPay_list.planId']");//:visible
+	for(var i = 0; i < list.length; i++) {
+		var tr_i = $(list[i]).parents("tr").first();
+		var planType_i = tr_i.find("[id$='planType']").val();
+		var actDate_i = tr_i.find("input[id$='actDate']").val();
+		var planAmount_i = tr_i.find("input[id$='planAmount']").val();
+		if (actDate_i == '' || planAmount_i == '' || planType_i != '1') {//1:还本
+			continue;
+		}
+		if (actDate >= actDate_i) {
+			var planAmount_i = tr_i.find("input[id$='planAmount']").val().excludeNotNumericDot();
+			leftPlanAmount = FloatSub(leftPlanAmount, planAmount_i);
+		}
+	}
+	
+	leftPlanAmountObj.parent().html(FormatMoney(leftPlanAmount, 2)).append(leftPlanAmountObj);
+}
+
+function getFeatchMoney(obj){
+	var tr = $(obj).parents('tr').first();
+	var contractId = $("input[id$='contractId']").val();
+	var fetchNo = obj.value;
+	var contexecType = $(tr).find("select[id$='planType']").val();
+	var fetchMoney =  $(tr).find("[id$='fetchAmount']");
+	var assBankId =  $(tr).find("[id$='assBankId']");
+	var currency =  $(tr).find("[id$='currencyNo']");
+			$.ajax({
+				  type: 'POST',
+				  url: "GDEBIT@AjaxGetUmPayAmount.sf",
+				  data: {'fetchNo':fetchNo,'contractId':contractId,"contexecType":contexecType},
+				  dataType:'json',
+				  success: function(data) {
+					var unPayAmount = data[0].unPayAmount;
+					var assBankIdVal = data[0].assBankId;
+					var currencyVal = data[0].currencyNo;
+					fetchMoney.val(unPayAmount);
+					assBankId.val(assBankIdVal);
+					currency.val(currencyVal);
+				  },
+				  error:function(){
+					  alert("业务繁忙!");
+				  }
+			});
+		$("input[id$='fetchNo']").val(fetchNo);
+}
+
+function doAccbillPlan(obj){
+	var tr_row = smartForm_add(obj);
+	var tr = $(tr_row);
+	var FK_NO = querySerialNumber('FK');//计划ID
+	setInfo4InputAndSpan(tr, 'planNo', FK_NO, FK_NO);
+//	
+	hideInput(tr, 'assBankId', 'select');
+	hideInput(tr, 'currencyNo', 'select');
+	hideInput(tr, 'planNo_FK', 'select');
+}
+
+nstc.sf.delCurrRow = function(obj){
+	var table = nstc.sf.findParent(obj, "TABLE");
+	var tr = nstc.sf.findParent(obj, "TR");
+	if(tr){
+		if(arguments[1] === true){
+			nstc.sf.changeFlag(obj,'delete');
+			$(tr).hide();
+		}else{
+			table.deleteRow(tr.rowIndex);
+		}
+		//增加iframe自动刷新
+		try{
+			// 如果当前页面被iframe加载，自适应计算iframe的高度，跨域不适用。
+			if(window.parent!=window) {
+			var frameId = window.frameElement && window.frameElement.id || '';
+				window.parent.smartForm_iFrameHeight(frameId);
+			}
+		}catch(e){}
+	}
+	countLeftPlanAmount4All();
+}

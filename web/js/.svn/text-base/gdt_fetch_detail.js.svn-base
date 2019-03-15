@@ -1,0 +1,46 @@
+/**
+ * 
+ */
+$(function(){
+	//计算天数
+	$("input[id='gdt_fetch_detail_plan.startDate']").each(function() {
+	    setTermDay(this);
+	});
+	
+	$("font").html('');
+	var errDiv = $("[id='div.gdt_common_file']")[0];
+	if(errDiv){
+		$(nstc.sf.findParent(errDiv,"TD")).next().remove();
+		$(errDiv).parent().css("width",'100%');  
+	}
+	hideTrByBussVariety();
+});
+//计算计息天数
+function setTermDay(obj) {
+	var tr = $(obj).parents("tr").first();
+	var startDate = tr.find("input[id$='.startDate']").val();
+	var endDate = tr.find("input[id$='.endDate']").val();
+	var dayCount = '';
+	if (startDate != '' && endDate != '') {
+		dayCount = dateDiff(startDate, endDate) + 1;
+	}
+	setInfo4InputAndSpan(tr, 'dayCount', dayCount, dayCount);
+}
+
+function hideTrByBussVariety() {
+	var variety = $("input[id='gdt_fetch_detail_con.bussVariety']").val();
+	//债券发行、融资租赁、资产证券化、基金、票据贴现、产业基金
+	if(variety == 'CLMS02' || variety == 'CLMS26' || variety == 'CLMS28' || variety == 'CLMS30' || variety == 'CLMS36' || variety == 'CLMS11'){
+		/**
+		 * 无需录入利率调整方式、频率、利率调整生效日、付息方式、还本方式等信息
+		 */
+		$("[id='gdt_fetch_detail_fetch.rateAdjustType']").parents("tr").first().hide();
+		$("[id='gdt_fetch_detail_fetch.rateEffectiveDayType']").parents("tr").first().hide();
+		$("[id='gdt_fetch_detail_fetch.floatType']").parents("tr").first().hide();
+		$("[id='gdt_fetch_detail_fetch.payInterestType']").parents("tr").first().hide();
+		$("[id='gdt_fetch_detail_fetch.rePaymentType']").parents("tr").first().hide();
+	}
+	if(variety!='CLMS28'){
+		$("[id='div.gdt_fetch_detail_pro']").hide();
+	}
+}

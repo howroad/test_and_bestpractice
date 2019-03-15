@@ -1,0 +1,237 @@
+// 融资申请页面 --> 添加/查看/修改
+
+$(function(){
+	var m = document.getElementById('m').value;
+	
+	//动态显示授信品种
+	var bussClass = document.getElementById('gdt_financeApplyEntryLC_info.bussClass');
+	var bussVariety = document.getElementById('gdt_financeApplyEntryLC_info.bussVariety');
+	//默认信用证
+	bussClass.value="CLMS03";
+	bussVariety.value="CLMS15";
+	if(m=='a')queryBussVariety(bussClass,bussVariety);
+	$("select[id$=.bussVariety]").val("CLMS15");
+	//m=v模式下显示申请日志
+	var div = document.getElementById('div.gdt_log');
+	div.style.display = 'none';
+	changeBackToBack();
+	changeForexType();
+	if(m!=null&&m=='v'){
+		div.style.display = '';
+		$("font").text("");
+		//设置单选框不可改
+		$("input[id$='_bill.wheBackToBack']").attr("disabled","true");
+		$("input[id$='_bill.partialShipments']").attr("disabled","true");
+		$("input[id$='_bill.recourse']").attr("disabled","true");
+		$("input[id$='_bill.tranShipment']").attr("disabled","true");
+		var superLcNo = $('input[id$=_info.superLcNo]');
+		doHiddenApply(superLcNo);
+		var productDesc = $('input[id$=_bill.productDesc]');
+		productDesc.parent().parent().removeAttr('noWrap');
+	}
+	
+	//实现删除附件,页面不刷新   
+	var pageCode = $("input[id='pageCode']").val();
+	var tab = $("input[id='"+pageCode+"_info._applyFiles_del']").prev();
+	var tBody = tab.find('tbody');
+	//获取tBody下面所有的子节点
+	tBody.children().each(function(){
+		//获取每个tr下的 第二个 td
+		var tdObj = $(this).children('td').eq(1);
+		//获取每个tr下的 第二个 td 下 的第二个 a 标签
+		var aObj = tdObj.children('a').eq(1);
+		var href = $(aObj).attr("href");
+		//重置href属性,不让页面跳转
+		$(aObj).attr("href","javascript:void(0)");
+		//添加点解事件
+		aObj.click(function(){
+			$.ajax({
+				type: 'POST',
+				url: href,
+				async : false,
+				dataType: "text",
+				success: function(data) {
+					//删除成功,删除这一行 tr
+					$(aObj).parent().parent().remove();
+				}
+		  	});  
+		});
+	})
+	
+});
+
+//保存按钮
+function doEntrySave(obj){
+	$("[id$=.isApprove]").val("0");
+	if(!saveCheck()){
+		return ;
+	}
+	
+	smartForm_doSave(obj);
+}
+
+//提交按钮
+function doEntrySubmit(obj){
+	$("[id$=.isApprove]").val("1");
+	if(!saveCheck()){
+		return ;
+	}
+	smartForm_doSave(obj);
+}
+// 提交/保存  之前先进行校验
+function saveCheck(){
+	/*var issueDate = $('input[id$=.issueDate]').val();
+	var dueDate = $('input[id$=.dueDate]').val();
+	//校验日期
+	if(!compareDate(issueDate, dueDate, '开始日不能晚于到期日')){
+		return false;
+	}*/
+	var bussVariety = document.getElementById('gdt_financeApplyEntryLC_info.bussVariety').value;
+	if(!doCheckBankIsNull(bussVariety)){
+		alert("合作金融网点不存在！");
+		return false;
+	}
+	//校验融资合同 与 担保合同 大行是否相同
+	//TA0640取消校验 by 20180719
+//	if(!doCheckBank()){
+//		alert("融资合同所属大行与授信合同所属大行不一致");
+//		return false;
+//	}
+	var files = $('input[id$=applyFiles_filetext]');
+	if(!validateFileForamtBatch(files)){
+		alert("系统不允许上传可执行格式的文件");
+		return false;
+	}
+	return true;
+}
+
+//选择 -- 金融合作网点
+var lastBankNo = "";
+function setAssBank(obj){
+	if(lastBankNo == "")lastBankNo = $("input[id$='_info.bankNo']").val();
+	if(lastBankNo == "")lastBankNo = obj.bankNo;
+	var rowIndex = obj.rowIndex;
+	var assBankId= obj.assBankId;
+	var assBankName= obj.assBankName;
+	var bankNo = obj.bankNo;
+	$("input[id$='_info.assBankId']").val(assBankId);
+	$("input[id$='_info.assBankName']").val(assBankName);
+	$("[name$='_bill.bankNo']").val(bankNo);
+	var html = "<input id='gdt_financeApplyEntryLC_bill.bankName' name='gdt_financeApplyEntryLC_bill.bankName' type='hidden' value='"+obj.bankName+"'/>"
+	$("[name$='_bill.bankName']").parent("span").html(obj.bankName+html);
+	//切换合作金融网点大行，清空授信担保信息
+	if(lastBankNo !=bankNo){
+		emptyData();
+		lastBankNo = bankNo;
+	}
+}
+//切换即期远期
+function changeForexType(){
+	var forexType = $("[name$='.forexType']").val();
+	if(forexType=='SPOT'){//即期
+		$("[name$='.payTerm']").hide();
+		$("[name$='.payTerm']").val("");
+		$("[name$='.payTerm']").removeAttr("validate");
+		$("[doc=payTermTag]").find("label").html("");
+	}else if(forexType='FORWARD'){//远期
+		$("[name$='.payTerm']").show();
+		$("[name$='.payTerm']").attr("validate","require|");
+		$("[doc=payTermTag]").find("label").html("<FONT color=red>*</FONT>远期天数");
+	}
+}
+//是否背对背
+function changeBackToBack(){
+	var back=$('input:radio[name$="wheBackToBack"]:checked').val();
+	if(back == 0){
+		$(nstc.sf.findParent($("[name$='.superLcNo']").get(0), "TR")).hide();
+		$(nstc.sf.findParent($("[name$='.superOpenBank']").get(0), "TR")).hide();
+		$("[name$='.superLcNo']").val("");
+		$("[name$='.superCurrency']").val("");
+		$("[name$='.superLcNo']").removeAttr("validate");
+		var superCurrencyName = "<input id='gdt_financeApplyEntryLC_bill.superCurrencyName' name='gdt_financeApplyEntryLC_bill.superCurrencyName' type='hidden'/>";
+		$("[name$='.superCurrencyName']").parent("span").html(superCurrencyName);
+		var superOpenBank = "<input id='gdt_financeApplyEntryLC_bill.superOpenBank' name='gdt_financeApplyEntryLC_bill.superOpenBank' type='hidden'/>";
+		$("[name$='.superOpenBank']").parent("span").html(superOpenBank);
+		var superBlAmount = "<input name='gdt_financeApplyEntryLC_bill.superBlAmount' id='gdt_financeApplyEntryLC_bill.superBlAmount' type='hidden' format='money'/>";
+		$("[name$='.superBlAmount']").parent("span").html(superBlAmount);
+	}else if(back == 1){
+		$(nstc.sf.findParent($("[name$='.superLcNo']").get(0), "TR")).show();
+		$(nstc.sf.findParent($("[name$='.superOpenBank']").get(0), "TR")).show();
+		$("[name$='.superLcNo']").attr("validate","require|");
+	}
+}
+	
+// 设置信用证母证
+function setLCBill(result){
+	$("[name$='.superLcNo']").val(result.billNo);
+	$("[name$='.superCurrency']").val(result.currencyNo);
+	var superCurrencyName = "<input id='gdt_financeApplyEntryLC_bill.superCurrencyName' name='gdt_financeApplyEntryLC_bill.superCurrencyName' type='hidden' value='"+result.currencyName+"'/>";
+	$("[name$='.superCurrencyName']").parent("span").html(result.currencyName+superCurrencyName);
+	var superOpenBank = "<input id='gdt_financeApplyEntryLC_bill.superOpenBank' name='gdt_financeApplyEntryLC_bill.superOpenBank' type='hidden' value='"+result.accBankName+"'/>";
+	$("[name$='.superOpenBank']").parent("span").html(result.accBankName+superOpenBank);
+	var superBlAmount = "<input name='gdt_financeApplyEntryLC_bill.superBlAmount' id='gdt_financeApplyEntryLC_bill.superBlAmount' type='hidden' format='money' value='"+result.billAmount+"'/>";
+	$("[name$='.superBlAmount']").parent("span").html(FormatMoney0(result.billAmount)+superBlAmount);
+	
+}
+//计算期限
+function checkStartDate(){
+	var startDate = $('input[id$=.issueDate]').val();
+	var endDate = $('input[id$=.dueDate]').val();
+	if(!compareDate(startDate, endDate, '开证日期不能晚于有效期')){
+		$('input[id$=.dueDate]').val('');
+		return false;
+	}
+	if(startDate != '' && endDate != ''){
+		var termDay = DateCompare(startDate,endDate);
+		$("input[id$=.termDay]").val(termDay);
+	}
+	checkLatestDate();
+}
+
+//校验最迟装运日
+function checkLatestDate(){
+	var endDate = $('input[id$=.dueDate]').val();
+	var latestShippingDate = $('input[id$=.lastShipmentDate]').val();
+	if(endDate =='' || latestShippingDate ==''){
+		return;
+	}
+	if(!compareDate(latestShippingDate, endDate, '最迟装运日不能晚于有效期')){
+		$('input[id$=.lastShipmentDate]').val('');
+		return false;
+	}
+}
+
+//选择申请,设置单位不能点击
+function doHiddenApply(clt){
+	clt.hide();
+	clt.parent("span").html(clt.val());
+}
+
+//选择 -- 修改值
+function setNsclient(obj){
+	var cltNo = $("input[id$=_info.cltNo]").val();
+	if(cltNo != obj.cltNo){
+		try {
+			emptyGuarantee()
+		} catch (e) {}
+		
+		try {
+			emptyCredit()
+		} catch (e) {}
+	}
+	$("input[id$=.cltNo]").val(obj.cltNo);
+	$("input[id$=.cltName]").val(obj.cltName);
+}
+
+function checkNumber(obj){
+	if(obj.value!=''){
+		obj.value =obj.value.replace(/\D/g,'');
+		if(isNaN(obj.value)){
+			alert("远期天数输入不合理，请重新输入");
+			obj.value='';
+			obj.focus();
+			return false;
+		}
+	}
+	smartPage_checkLength(obj,3);
+}

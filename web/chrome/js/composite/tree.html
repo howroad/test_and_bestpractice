@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+<TITLE>选择节点</TITLE>
+<link href="../../skin/MzTreeView.css" rel="stylesheet" type="text/css"></link>
+<SCRIPT language="javaScript" src="MzTreeView12.js"></SCRIPT>
+<SCRIPT language="javaScript" src="tree.js"></SCRIPT>
+<STYLE>
+body {
+	font: normal 12px 宋体
+}
+
+.MzTreeViewDiv {
+	background: #FFF;
+	border: 1px solid #000;
+	height: 250px;
+	overflow: auto;
+}
+</STYLE>
+<script>
+	var parentWin = window.dialogArguments;
+	//var parentWin = window.opener;
+	function selectEle() {
+		parentWin.SmartPage_TreeShowText.value = multiTree.currentNode.T;
+		parentWin.SmartPage_TreeValEle.value = multiTree.currentNode.sourceIndex
+				.split("_")[1];
+		window.close();
+	}
+	function clearVal() {
+		parentWin.SmartPage_TreeShowText.value = "";
+		parentWin.SmartPage_TreeValEle.value = "";
+		window.close();
+	}
+</script>
+</head>
+<BODY>
+<div align='center'><input type=button value='确定'
+	onclick='selectEle()'> <input type=button value='取消'
+	onclick='window.close()'><input type=button value='清空'
+	onclick='clearVal()'></DIV>
+<DIV id='multiTree' class='MzTreeViewDiv'></DIV>
+<SCRIPT language="javascript" type="text/javascript">
+	nstc.sf.rendTreeToEle(document.getElementById("multiTree"),
+			parentWin.SmartPage_TreeDataEle.value,
+			parentWin.SmartPage_TreeValEle.value, true);
+</SCRIPT>
+</BODY>
+</HTML>

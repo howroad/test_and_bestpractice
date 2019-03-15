@@ -1,0 +1,3 @@
+
+#box { position: absolute; display: none; background:#fff; text-align: center; top: 0; background-color:#000; /*background-color: rgba(0,0,0,0.55);*/opacity: 0.8;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=55); -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=55)"; color: #fff; height: 100%; cursor: move; }
+#box p { line-height: 34px; }

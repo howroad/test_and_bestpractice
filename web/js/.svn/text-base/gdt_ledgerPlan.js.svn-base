@@ -1,0 +1,454 @@
+//放还款计划管理
+$(function (){
+	//动态显示授信品种
+	var bussClass = $("select[id$='_conInfo.bussClass']").get(0);
+	var bussVariety = $("select[id$='_conInfo.bussVariety']");
+	var bussVarietyValue = bussVariety.val();
+	queryBussVares(bussClass, '','','add');
+	var bussVarietyArr = $("select[id$='_conInfo.bussVariety'] option");
+	if (bussVarietyArr.eq(0).val() == '') {
+		bussVarietyArr.eq(0).remove();
+	}
+	if (bussVarietyValue != '') {
+		//bussVariety.val(bussVarietyValue);
+		bussVariety.attr('value',bussVarietyValue);
+	}
+	$("div[id='div.gdt_ledgerPlanInfo4AS_list']").hide();
+	//不同业务品种，显示不同页面
+	if (bussVarietyValue == 'CLMS10' || bussVarietyValue == 'CLMS37') {//承兑汇票、信用证开立
+		$("div[id='div.gdt_ledgerPlan_accbillList']").show();
+		$("div[id='div.gdt_ledgerPlan_drawings']").hide();
+		$("div[id='div.gdt_ledgerPlan_list']").hide();
+		$("div[id='div.gdt_ledgerPlan_recList']").hide();
+		$("[name='hclms011']").show();
+		$("[id$='accbillList.titleId']").text('合同还款计划详情');
+	} else if (bussVarietyValue == 'CLMS11'){ //票据贴现
+		$("div[id='div.gdt_ledgerPlan_accbillList']").show();
+		$("div[id='div.gdt_ledgerPlan_drawings']").hide();
+		$("div[id='div.gdt_ledgerPlan_list']").hide();
+		$("div[id='div.gdt_ledgerPlan_recList']").show();
+		//add by yujin 20180724
+		$("[id$='accbillList.titleId']").text('合同付款计划详情');
+		//票据贴现 费用计划登记的单元的提款号要隐藏，合同还款计划详情单元的合作金融网点要隐藏
+		//非票据贴现显示
+		//这个属性是在smartpage的td定制里加的
+		$("[name='hclms011']").hide();
+	}else if(bussVarietyValue == 'CLMS28'){//资产证券化
+		$("div[id='div.gdt_ledgerPlanInfo4AS_list']").show();
+		$("div[id='div.gdt_ledgerPlan_accbillList']").hide();
+		$("div[id='div.gdt_ledgerPlan_drawings']").show();
+		$("div[id='div.gdt_ledgerPlan_list']").hide();
+		$("div[id='div.gdt_ledgerPlan_recList']").hide();
+		$("[name='hclms011']").show();
+	}else {
+		$("div[id='div.gdt_ledgerPlan_accbillList']").hide();
+		$("div[id='div.gdt_ledgerPlan_drawings']").show();
+		$("div[id='div.gdt_ledgerPlan_list']").show();
+		$("div[id='div.gdt_ledgerPlan_recList']").hide();
+		$("[name='hclms011']").show();
+	}
+	
+	//合作金融网点（债券发行、资产证券化、基金：无）
+	if (bussVarietyValue == 'CLMS02' || bussVarietyValue == 'CLMS28' || bussVarietyValue == 'CLMS30'
+		 || bussVarietyValue == 'CLMS36') {
+		//隐藏
+		$("select[id$='gdt_ledgerPlan_drawings.assBankId']").removeAttr('validate').hide();
+		$("select[id$='gdt_ledgerPlan_fees.assBankId']").removeAttr('validate').hide();
+	}
+	
+	//计算天数
+	$("input[id='gdt_ledgerPlan_list.startDate']").each(function() {
+		setTermDay(this);
+	});
+	$("input[id='gdt_ledgerPlanInfo4AS_list.startDate']").each(function() {
+		setTermDay(this);
+	});
+	//提款计划
+	$("a[id='gdt_ledgerPlan_drawings.el_14']").each(function(){
+		var tr = $(this).parents("tr").first();
+		var fetchNoObj = tr.find("input[id$='.fetchNo']");
+		if (fetchNoObj.val() == '') {
+			$(this).hide();
+		} else {
+			tr.find("input[id$='_check']").remove();
+		}
+		//提款计划登记不可编辑
+		hideLedgerPlanDrawings(fetchNoObj[0]);
+	});
+	
+	//费用计划
+	$("input[id='gdt_ledgerPlan_fees.executeState']").each(function(){
+		var tr = $(this).parents("tr").first();
+		var guaranteePlanId = tr.find("input[id$='.guaranteePlanId']").val();
+		/*if (this.value == '1' || guaranteePlanId != '') {*///已执行
+		if (this.value == '1'/* || guaranteePlanId != ''*/) {
+			//已执行的、担保费不允许删除
+			tr.find("input[id$='_check']").remove();
+			//已执行的不可编辑
+			hideLedgerPlanFees(this, guaranteePlanId);
+		}
+	});
+	
+	//合同还款计划（承兑汇票）
+	$("input[id='gdt_ledgerPlan_accbillList.executeState']").each(function(){
+		var tr = $(this).parents("tr").first();
+		if (this.value == '1') {//已执行
+			//已执行的不允许删除
+			tr.find("input[id$='_check']").remove();
+		}
+		//隐藏不可编辑的信息
+		hideLedgerPlanAccbill(this);
+	});
+	//当发生额类型为还本时，明细这一列的链接应该隐藏
+	$("[id$='gdt_ledgerPlan_list.planType']").each(function(){
+		var tr = $(this).parents("tr").first();
+		if($(this).val() == '1'){
+			tr.find("[id$='el_20']").hide();
+		}
+		if($(this).val() == '2'){
+			var rate = tr.find("[id$='rate']").val();
+			if (rate != '') {
+				tr.find("[id$='el_20']").hide();
+			}
+		}
+		if (bussVarietyValue == 'CLMS26') {
+			tr.find("[id$='el_20']").hide();
+		}
+	});
+	$("[id$='gdt_ledgerPlanInfo4AS_list.planType']").each(function(){
+		var tr = $(this).parents("tr").first();
+		if($(this).val() == '1'){
+			tr.find("[id$='el_20']").hide();
+		}
+		if($(this).val() == '2'){
+			var rate = tr.find("[id$='rate']").val();
+			if (rate != '') {
+				tr.find("[id$='el_20']").hide();
+			}
+		}
+		if (bussVarietyValue == 'CLMS26') {
+			tr.find("[id$='el_20']").hide();
+		}
+	})
+});
+
+function doSave(obj) {
+	var list1 = $("input[id='gdt_ledgerPlan_drawings.planId']");
+	var list2 = $("input[id='gdt_ledgerPlan_fees.planId']");
+	var list3 = $("input[id='gdt_ledgerPlan_accbillList.planId']");
+	var list4 = $("input[id='gdt_ledgerPlan_recList.planId']");
+	if (list1.length < 2 && list2.length < 2 && list3.length < 2 && list4.length < 2) {
+		alert("请先新增计划再保存");
+		return;
+	}
+	
+	smartForm_doSave(obj);
+}
+
+function queryBussVares4Plan(obj) {
+	queryBussVares(obj, '','','add')
+	var bussVariety = $("select[id$='_conInfo.bussVariety'] option");
+	if (bussVariety.eq(0).val() == '') {
+		bussVariety.eq(0).remove();
+	}
+}
+
+//选择合同
+function selectContract(nonState) {
+	var bussClass = $("select[id='gdt_ledgerPlan_conInfo.bussClass']").val();
+	var bussVariety = $("select[id='gdt_ledgerPlan_conInfo.bussVariety']").val();
+	
+	var url = "GDEBIT@gdt_selectCon4Plan.sf?bussClass=" + bussClass 
+		+ "&bussVariety=" + bussVariety;
+	if(nonState!=undefined&&nonState!=null&&nonState!=""){
+		var url=url+"&nonState=" + nonState;
+	}
+	openwin(url, '合同列表', 1000, 500);
+}
+//回写合同信息
+function setContractInfo(data) {
+	/*$("select[id='gdt_ledgerPlan_conInfo.bussClass']").val(data.bussClass);*/
+	$("select[id='gdt_ledgerPlan_conInfo.bussClass']").attr('value',data.bussClass);
+	var bussClass = $("select[id$='_conInfo.bussClass']").get(0);
+	queryBussVares(bussClass, '');
+
+	//$("select[id='gdt_ledgerPlan_conInfo.bussVariety']").val(data.bussVariety);
+	$("select[id='gdt_ledgerPlan_conInfo.bussVariety']").attr('value',data.bussVariety);
+	$("input[id='gdt_ledgerPlan_conInfo.contractNo']").val(data.contractNo);
+	$("input[id='gdt_ledgerPlan_conInfo.contractId']").val(data.contractId);
+	
+	setInfo4Span("gdt_ledgerPlan_conInfo.cltName", data.cltName, data.cltName);
+	setInfo4Span("gdt_ledgerPlan_conInfo.startDate", data.startDate, data.startDate);
+	setInfo4Span("gdt_ledgerPlan_conInfo.endDate", data.endDate, data.endDate);
+	
+	var obj = $("input[id='gdt_ledgerPlan_conInfo.refresh']")[0];
+	smartForm_doRefresh(obj);
+}
+
+function setInfo4Span(id, inputValue, spanValue) {
+	var obj = $("input[id='" + id + "']");
+	obj.val(inputValue);
+	obj.parent().html(spanValue).append(obj);
+}
+
+//新增行【0融入；3费用；4付款;5收款】
+function addRow(obj, flag) {
+	var contractId = $("input[id='gdt_ledgerPlan_conInfo.contractId']").val();
+	if (contractId == '') {
+		alert("请先选择合同");
+		return;
+	}
+	
+	var tr_row = smartForm_add(obj);
+	var tr = $(tr_row);
+	
+	//合作金融网点、币种
+	var assBankIds = tr.find("select[id$='.assBankId']");
+	if (assBankIds.length > 1) {
+		
+	}
+	
+	if (flag == '0') {//提款计划
+		addDrawings(tr);
+	} else if (flag == '3'){//费用
+		addFees(tr);
+	} else if (flag == '4'){//付款
+		addPay(tr);
+	} else {  //收款
+		addRec(tr);
+	}
+}
+
+//add by 20180720 start
+//新增：贴现收款信息
+function addRec(tr){
+	var TK_NO = querySerialNumber('REC');//计划ID
+	setInfo4InputAndSpan(tr, 'planNo', TK_NO, TK_NO);
+}
+//add by 20180720 end
+
+//新增：提款计划
+function addDrawings(tr) {
+	var TK_NO = querySerialNumber('TK_PLAN');//计划ID
+	setInfo4InputAndSpan(tr, 'planNo', TK_NO, TK_NO);
+	//隐藏：维护还款计划
+	tr.find("a[id$='.el_14']").hide();
+}
+
+//新增：费用计划
+function addFees(tr) {
+	var FY_NO = querySerialNumber('FY');//计划ID
+	setInfo4InputAndSpan(tr, 'planNo', FY_NO, FY_NO);
+}
+//新增：付款计划
+function addPay(tr) {
+	var FK_NO = querySerialNumber('FK');//计划ID
+	setInfo4InputAndSpan(tr, 'planNo', FK_NO, FK_NO);
+	
+	hideInput(tr, 'assBankId', 'select');
+	hideInput(tr, 'currencyNo', 'select')
+}
+
+//删除【0融入；3费用；4付款】
+function delLedgerPlan(obj, flag) {
+	var planList;
+	//校验参数
+	var isTrue = false;
+	if (flag == '0') {//融入
+		planList = $("input[id='gdt_ledgerPlan_drawings._check']:checked");
+	} else if (flag == '3'){//费用
+		planList = $("input[id='gdt_ledgerPlan_fees._check']:checked");
+	} else if (flag == '5'){//收款
+		planList = $("input[id='gdt_ledgerPlan_recList._check']:checked");
+		//校验
+		isTrue = validateRecList(planList);
+	} else {//付款
+		planList = $("input[id='gdt_ledgerPlan_accbillList._check']:checked");
+	}
+	if (planList.length < 1) {
+		alert("至少勾选一条数据");
+		return;
+	}
+	//是否校验通过
+	if (isTrue){
+		return;
+	}
+	
+	$("input[id='gdt_ledgerPlan_conInfo.operation']").val(flag);
+	smartForm_doDelete(obj);
+}
+
+//校验，关联提款号的贴现收款信息无法删除
+function validateRecList(planList){
+	for (var i = 0; i < planList.length; i++) {
+		var tr = $(nstc.sf.findParent(planList[i], "TR"));
+		var fetchNo = $(tr).find("input[id$='.fetchNo']").val().trim();
+		if(fetchNo != null && fetchNo.length > 0 ){
+			var planNo = $(tr).find("input[id$='.planNo']").val();
+			alert("计划ID【"+planNo+"】有关联提款信息，不能删除");
+			return true;
+		}
+	}
+}
+
+//还款计划
+function addLedgerPlan4Repay(obj) {
+	var tr = $(obj).parents("tr").first();
+	var planId = tr.find("input[id$='.planId']").val();
+	var fetchNo = tr.find("input[id$='.fetchNo']").val();
+	var contractId = $("input[id='gdt_ledgerPlan_conInfo.contractId']").val();
+	var bussVariety =$("[id$='bussVariety']").val();
+	var url;
+	if(bussVariety=="CLMS28"){
+		//资产证券化走单独的页面，就是它要不一样一点，要特殊一点
+		url = "GDEBIT@gdt_ledgerPlan4Repay4AS.sf?m=a&contractId=" + contractId 
+		+ "&planId=" + planId + "&fetchNo=" + fetchNo;
+	}else{
+		url = "GDEBIT@gdt_ledgerPlan4Repay.sf?m=a&contractId=" + contractId 
+				+ "&planId=" + planId + "&fetchNo=" + fetchNo;
+	}
+	if (fetchNo == '' || contractId == '') {
+		return;
+	}
+	openwin(url, '还款计划', 1100, 500);
+}
+
+//不可编辑
+function hideInput(tr, id, type) {
+	var obj = tr.find("[id$='" + id + "']");
+	var value;
+	var html;
+	if (type == 'select') {
+		value = obj.find(" option:selected").text();
+		html = obj.html();
+	} else {
+		value = obj.val();
+	}
+	obj.hide().parent().html(value).append(obj);
+	
+	if (type == 'select') {
+		obj.html(html);
+	}
+}
+
+//提款计划登记：已执行的不可编辑
+function hideLedgerPlanDrawings(obj) {
+	if (obj.value == '') {//提款号为空
+		return;
+	}
+	var ids = ['actDate', 'assBankId', 'currencyNo', 'fetchAmount'];
+	var types = ['', 'select', 'select', ''];
+	var tr = $(obj).parents("tr").first();
+	tr.find("input[id='gdt_ledgerPlan_drawings.planAmount']").hide();
+	for (var i = 0; i < ids.length; i++) {
+		hideInput(tr, ids[i], types[i]);
+	}
+}
+//费用计划登记：已执行的不可编辑
+function hideLedgerPlanFees(obj, guaranteePlanId) {
+	var tr = $(obj).parents("tr").first();
+	var ids = ['actDate', 'assBankId','fetchNo', 'currencyNo', 'planAmount', 'feesVarietyNo', 'memo'];
+	var types = ['', 'select', 'select', 'select' ,'', 'select', ''];
+	for (var i = 0; i < ids.length; i++) {
+		if (obj.value == '0' && guaranteePlanId != '' && ids[i] == 'memo') {//未执行、且是担保费
+			//担保费：可以修改备注
+		} else {
+			hideInput(tr, ids[i], types[i]);
+		}
+	}
+}
+//合同还款计划（承兑汇票）：已执行的不可编辑
+function hideLedgerPlanAccbill(obj) {
+	var tr = $(obj).parents("tr").first();
+	
+	//合作金融网点、币种：不可编辑
+	var ids_t = ['assBankId', 'currencyNo'];
+	var types_t = ['select', 'select'];
+	for (var i = 0; i < ids_t.length; i++) {
+		hideInput(tr, ids_t[i], types_t[i]);
+	}
+	
+	//已执行:不可编辑
+	if (obj.value != '1') {//1：已执行
+		return;
+	}
+	var ids = ['actDate', 'planAmount', 'billNos', 'memo'];
+	var types = ['', '', '', ''];
+	for (var i = 0; i < ids.length; i++) {
+		hideInput(tr, ids[i], types[i]);
+	}
+}
+
+//增加GridUnit行
+function smartForm_add(obj) {
+	try {
+		var names = obj.name.split('.');
+		var unitname = names[0];
+		return nstc.sf.addRow(unitname, "tableCopy_" + unitname);
+	} catch (e) {
+
+	}
+	try{
+		var frameId = window.frameElement && window.frameElement.id || '';
+		if(window.parent != window)
+			window.parent.smartForm_iFrameHeight(frameId);
+	}catch(e){}
+}
+
+//点击确定操作
+function smartForm_confirm_true(){
+	var obj = $("input[id='gdt_ledgerPlan_conInfo.refresh']")[0];
+	smartForm_doRefresh(obj);
+}
+function smartForm_confirm(msg) {
+	alert(msg);
+	smartForm_confirm_true();
+}
+
+//计算计息天数
+function setTermDay(obj) {
+	var tr = $(obj).parents("tr").first();
+	var startDate = tr.find("input[id$='.startDate']").val();
+	var endDate = tr.find("input[id$='.endDate']").val();
+	var dayCount = '';
+	if (startDate != '' && endDate != '') {
+		dayCount = dateDiff(startDate, endDate) + 1;
+	}
+	setInfo4InputAndSpan(tr, 'dayCount', dayCount, dayCount);
+}
+
+function queryCurrencyByContract(obj) {
+	var tr = $(obj).parents("tr").first();
+	var contractId = $("input[id='gdt_ledgerPlan_conInfo.contractId']").val();
+	var assBankId = tr.find("select[id$='.assBankId']").val();
+	if (assBankId == '') {
+		return;
+	}
+	queryContractFactors(obj, 'currency', contractId, assBankId)
+}
+function openInterestDetailPage(obj) {
+	var tr = $(obj).parents("tr").first();
+	var planId = tr.find("input[id$='.planId']").val();
+	var url = "GDEBIT@gdt_selectInterestDetail.sf?m=v&planId=" + planId;
+	openwin(url, '付息计划详情', 1000, 500);
+}
+
+//校验承兑合同付款日期
+function checkActDate4AccBill(obj) {
+	var endDate =  $("input[id='gdt_ledgerPlan_conInfo.endDate']").val();//到期日
+	//增加校验开始日 by yujin 20180724  start
+	var startDate =  $("input[id='gdt_ledgerPlan_conInfo.startDate']").val();//到期日
+	var actDate = obj.value;//日期
+	if (actDate != '' && endDate != '') {
+		if (dateDiff(actDate, endDate) < 0){
+			obj.value = '';
+			alert("日期不能晚于合同到期日");
+			return;
+		}
+		if (dateDiff(startDate, actDate) < 0){
+			obj.value = '';
+			alert("日期不能早于合同开始日");
+			return;
+		}
+	}
+}

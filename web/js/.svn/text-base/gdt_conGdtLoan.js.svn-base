@@ -1,0 +1,184 @@
+//融资-贷款
+$(function(obj){
+	
+	//回显业务分类 和 业务品种
+	var bussClass = $("[id$='.bussClass']");
+	var bussVarietyValue = $("[id$=.bussVariety]").val();
+	doChange(bussClass[0],'add');
+	//隐藏业务品种和分类,展示值
+	/*var bussVariety = $("select[id$=.bussVariety]").val(bussVarietyValue);*/
+	var bussVariety = $("select[id$=.bussVariety]").attr('value',bussVarietyValue);
+	var cltName = $("input[id$='.cltName']").val();
+	var apply = $("input[id$='_form.applyId']").val();
+
+
+	var m = document.getElementById('m').value;
+	if(apply != undefined && apply != null && apply != ''&& m != 'v'){
+		var clt = $("input[id$='_info.cltName']");
+		doHiddenApply(clt);
+		doHidden(bussClass,bussVariety);
+	}
+	var pageCode = $("input[id='pageCode']").val();
+	if((m=='e' || m == '') && pageCode.indexOf("_finAppEntry") == -1){
+		doHidden(bussClass,bussVariety);
+	}
+	
+	if(bussVarietyValue == "CLMS33") {
+		/**
+		 * 获取委托单位编号,如果为空 则证明 是 集团外,不勾选选框
+		 */
+		var delegateCltNo = $("input[id$='_info.delegateCltNo']").val();
+		var delegateCltName = $("input[id$='_info.delegateCltName']").val();
+		if(delegateCltNo == undefined ||delegateCltNo == ""){
+			//显示输入框,隐藏选框
+			$("input[id$='delegateCltName_inner']").hide();
+			$("input[id$='delegateCltName_outer']").show();
+			$("input[id$='delegateCltName_outer']").val(delegateCltName);
+			$("input[id$='isDelegate']").attr('checked', false);
+		}else{ 
+			$("input[id$='isDelegate']").attr('checked', 'checked');
+			$("input[id$='delegateCltName_outer']").hide();
+			$("input[id$='delegateCltName_inner']").show();
+			$("input[id$='delegateCltName_inner']").val(delegateCltName);
+		}
+		
+		var m = document.getElementById('m').value;
+		if(m!=null && m=='v'){
+			$("[id$='_info.isDelegate']:checkbox").attr("disabled",true);
+		}
+		
+		/*if(m=='e' || m == 'v' || m == ''){
+			if (bussClass[0] != undefined) {
+				doHidden(bussClass,bussVariety);
+			}
+		}*/
+	}
+	
+	var channel = $("input[id$='gdt_common_form.channel']").val();
+    //当channel字段不为GDEBIT时，将带入的数据置换为不可写
+	if(isNotNull(channel) && channel != "GDEBIT"){
+		var variety = bussVarietyValue;
+		 if(variety == 'CLMS31'){
+				// 集合资管贷款
+			 var table = $("#gdt_conAssetManage_info");
+			 doReadOnly(table);
+		 }else if(variety == 'CLMS32'){
+				// 非金债
+				 var table = $("#gdt_conNoGoldDebt_info");
+				 doReadOnly(table);
+		 }else if(variety == 'CLMS33'){
+				// 信托贷款
+			 var table = $("#gdt_conTrustLoan_info");
+			 doReadOnly(table);
+		 }else if(variety == 'CLMS34'){
+				//间接融资-贷款》外保内贷
+			 var table = $("#gdt_conOutIn_info");
+			 doReadOnly(table);
+			}else if(variety == 'CLMS35'){
+				//类保理
+				 var table = $("#gdt_conClassFactor_info");
+				 doReadOnly(table);
+			}else if(variety == 'CLMS36'){
+				//产业基金
+				 var table = $("#gdt_conIndustryFund_info");
+				 doReadOnly(table);
+			}else if(variety == 'CLMS38'){
+				//保险债权计划
+				 var table = $("#gdt_conICPlan_info");
+				 doReadOnly(table);
+			}
+	}
+
+	
+});
+
+//选择委托单位
+function selectDelegate(){
+	//获取单位
+	var cltNo = $("input[id$='_info.cltNo']").val();
+//	if(cltNo == undefined || cltNo == null || cltNo == ""){
+//		alert("请先选择单位!");
+//		return;
+//	}
+	var url = "GDEBIT@gdt_nsClientSlt.sf?isClear=1&isAll=1";
+	openwin(url, '单位列表', 500, 400);
+}
+
+//选择集团内 or 集团外
+function checkInOrOut(){
+	var inner = $("input[id$='delegateCltName_inner']");
+	var outer = $("input[id$='delegateCltName_outer']");
+	inner.val("");
+	outer.val("");
+	$("input[id$='delegateCltNo']").val("");
+	$("input[id$='delegateCltName']").val("");
+	if(inner.is(":hidden")){
+		inner.show();
+		outer.hide();
+	}else{
+		inner.hide();
+		outer.show();
+	}
+}
+
+//集团外 失去焦点时间
+function setDelegateCltName(obj){
+	var delegateCltName = obj.value;
+	$("input[id$='delegateCltName']").val(delegateCltName);
+}
+
+
+function setDelegate(obj){
+	var delegateCltNo = obj.cltNo;
+	var delegateCltName = obj.cltName;
+	$("input[id$='delegateCltName_inner']").val(delegateCltName);
+	$("input[id$='delegateCltName']").val(delegateCltName);
+	$("input[id$='delegateCltNo']").val(delegateCltNo);
+}
+
+//录入保存按钮(信用证买方押汇合同登记保存调用)
+function doEntrySave(obj){
+	$("[id$=.isApprove]").val("0");
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	/**
+	 * 因为内源的数据有设置为disabled,所以保存的时候需要去掉disabled
+	 * lihongling
+	 */
+	$("input[type='text']:visible").removeAttr("disabled");
+	$("select:visible").removeAttr("disabled");
+	smartForm_doSave(obj);
+}
+
+//录入提交按钮
+function doEntrySubmit(obj){
+	$("[id$=.isApprove]").val("1");
+	var tab = document.getElementById("gdt_guarantee");
+	var trs = $(tab).find('tbody tr:visible');
+	for ( var int = 0; int < trs.length; int++) {
+		var guaranteeId = $(trs[int]).find("input[id$='guaranteeId']").val();
+		var isApply = $(trs[int]).find("input[id$='isApply']").val();
+		 if(isApply==1){
+			 var guaranteeNo = $(trs[int]).find("input[id$='guaranteeNo']").val(); 
+				
+			 if (guaranteeNo == undefined || guaranteeNo == "") {
+					alert("请先进行担保合同的补录！");
+					return;
+				}
+		 }
+	}
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	/**
+	 * 因为内源的数据有设置为disabled,所以保存的时候需要去掉disabled
+	 * lihongling
+	 */
+	$("input[type='text']:visible").removeAttr("disabled");
+	$("select:visible").removeAttr("disabled");
+	smartForm_doSave(obj);
+}
+

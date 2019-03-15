@@ -1,0 +1,39 @@
+//选择按钮
+function selectGuaranteeInfo(){
+	//判断是否多次选择
+	var billId = $("input[id$='_lgm.billId']");
+	if(billId.length >= 2){
+		alert("只能选择一个保函！");
+		return ;
+	}
+	var cltNo = $("input[id$='.cltNo']").val();
+	var url = "GDEBIT@gdt_selectGuaranteeInfo.sf?m=v&cltNo=" + cltNo;
+	openwin(url, "保函信息选择", 900, 550);
+}
+
+function setGuaranteeInfo(obj){
+	var btnAdd = $("input[id$='_lgm.add']")[0];
+	var tr_row = smartForm_add(btnAdd);
+	var tr = $(tr_row);
+	
+	tr.find("input[id$='.lgmNo']").parent().html(obj.lgmNo);
+	tr.find("input[id$='.billId']").val(obj.billId);
+	tr.find("input[id$='.contractKind']").parent().html(obj.contractKind);
+	tr.find("input[id$='.amount']").parent().html(obj.amount);
+	tr.find("input[id$='.benefitCustName']").parent().html(obj.benefitCustName);
+	tr.find("input[id$='.financialName']").parent().html(obj.financialName);
+	tr.find("input[id$='.contractStartDate']").parent().html(obj.contractStartDate);
+	tr.find("input[id$='.contractEndDate']").parent().html(obj.contractEndDate);
+}
+
+function doDelete(){
+	var list=$('div[id$="_lgm"]');
+	var checks=list.find('input[id$="_check"]:checked');
+	if(checks==undefined || checks.length==0){
+		alert("至少选择一条数据");
+		return;
+	}
+	$(checks).each(function(){
+		nstc.sf.delCurrRow(this)
+	});
+}	

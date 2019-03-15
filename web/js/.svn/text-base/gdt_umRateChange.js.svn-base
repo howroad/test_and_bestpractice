@@ -1,0 +1,70 @@
+$(function(){
+	var list=$('table[id="gdt_umRateChange_list"]');
+	var trs=list.find("tbody tr:visible");
+	for(var i=0;i<trs.length;i++){
+		var note=$(trs[i]).find('input[id$="approveNote"]');
+		if(note!=''){
+			$(trs[i]).css("background-color", "#FFC0CB");
+		}
+	}
+});
+//选择金融合作网点
+function selectAssBank(){
+	var url = "GDEBIT@gdt_associateBankSlt.sf";
+	openwin(url, '金融合作网点列表', 500, 400);
+}
+
+//选择单位
+function selectNsClient(){
+	var url = 'GDEBIT@gdt_nsClientSlt.sf';
+	openwin(url, '单位列表', 500, 400);
+}
+function setNsclient(obj){
+	$("input[id$=.cltNo]").val(obj.cltNo);
+	$("input[id$=.cltName]").val(obj.cltName);
+}
+
+function doSubmit(obj){
+	if(isChecked()){
+		smartForm_doSubmit(obj);
+	}
+}
+function doDelete(obj){
+	if(isChecked()){
+		if(confirm("确认删除数据么")){
+			smartForm_doSubmit(obj);
+		}
+	}
+}
+//全选
+function checkAll(obj){
+	smartForm_all_checkbox(obj,'gdt_umRateChange_list._check');
+	getCheckSize();
+}
+//选择某一个
+function checkRec(obj){
+	nstc.sf.clickCheckbox(obj);
+	getCheckSize();
+}
+function getCheckSize(){
+	var selectRecords = $("[id$=selectRecords]").val();
+	var checkNum=getCheckNum();
+	var selectRecordsHtml  = '<input id="selectRecords" name="selectRecords" type="hidden" value="'+selectRecords+'"/>'
+	$("[id$=selectRecords]").parent().html("共计"+selectRecords+"笔，已选"+checkNum+"笔。"+selectRecordsHtml);
+}
+//获取选中的行
+function getCheckNum(){
+	var checkObj = $("[id$=._check]:visible");
+	var checkNum = 0;
+	for ( var i = 0; i < checkObj.length; i++) {
+		if (checkObj[i].checked) {
+			checkNum++;
+		}
+	}
+	return checkNum;
+}
+
+function showRateChangeDetail(fmId){
+	var url = "GDEBIT@gdt_umRateChangeDetail.sf?fmId=" + fmId;
+	openwin(url, "利率修正详情", 800, 600);
+}

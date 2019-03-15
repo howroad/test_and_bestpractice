@@ -1,0 +1,3 @@
+function refreshPage(obj) {
+    smartForm_doRefresh(obj);
+}

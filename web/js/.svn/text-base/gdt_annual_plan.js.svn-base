@@ -1,0 +1,61 @@
+$(function(){
+	var flag = $("[id$='flag']").val();
+	console.log(flag);
+	if(flag=='0'){
+		var annual_plans = $("[id$='annual_plan']:visible");
+		var annual_plan_bzs = $("[id$='annual_plan_bz']:visible");
+		for(var i=0;i<annual_plans.length;i++){
+			var tr=$(annual_plans[i]).closest("tr");
+			var v1 = $(annual_plans[i]).val();
+			var tr2=$(annual_plan_bzs[i]).closest("tr");
+			var v2 = $(annual_plan_bzs[i]).val();
+			setInfo4InputAndSpan1(tr,'annual_plan',v1,v1);
+			setInfo4InputAndSpan1(tr2,'annual_plan_bz',v2,v2);
+		}
+	}
+})
+
+//设置input隐藏域的值，及span标签的值
+function setInfo4InputAndSpan1(tr, id, inputValue, spanValue) {
+	
+	var obj = tr.find("input[id$='." + id + "']");
+	obj.val(inputValue);
+	var idStr = $(obj).attr("id");
+	var objStr = "<input type='hidden' id='"+idStr+"' name='"+idStr+"' value='"+inputValue+"'>";
+	obj.parent().html(spanValue).append(objStr);
+}
+
+
+function checkdate(obj){	
+	var year = $(obj).val();
+	var now  = new Date().getFullYear();
+	
+	if(year == null||year == ''){
+		alert("请先选择年份！");	
+	}else if(year<now-10 || year>now+10){
+		alert("请选择正确的年份！")
+	}else{
+		var buttonObj = document.getElementById("gdt_annual_plan_form.refresh");
+		 if(buttonObj){
+			smartForm_doRefresh(buttonObj);
+			}
+		
+
+	}
+}
+
+function checkyear(obj){	
+	var now  = new Date().getFullYear();
+	var yearObj = document.getElementById("gdt_annual_plan_form.annual_plan_year");
+	var year = $(yearObj).val();
+	if(year>=now){
+
+	smartForm_doSave(obj);
+	}else{
+		alert("此年份不能被修改！")
+	}
+}
+
+
+
+

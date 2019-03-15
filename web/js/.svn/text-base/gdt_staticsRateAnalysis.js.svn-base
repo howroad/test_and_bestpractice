@@ -1,0 +1,23 @@
+function showFinaceContract(cltNo, bussVariety, startRate, endRate){
+	var actDate = $('input[id$=.actDate]').val();
+	var currencyNo = $('select[id$=.currencyNo]').val();
+	var bankNo = $("select[id$='.bankNo']").val();
+	var url = 'GDEBIT@gdt_finaceContract.sf?m=a&cltNo=' + cltNo 
+	          + '&bussVariety=' + bussVariety 
+	          + '&currencyNo=' + currencyNo
+			  + '&actDate=' + actDate
+			  + '&startRate=' + startRate
+			  + '&endRate=' + endRate
+			  + '&bankNo=' + bankNo;
+	openwin(url, '合同列表', 1000, 700);
+}
+
+//查询操作
+function doRefresh(obj){
+	/*var minEndDate = $('input[id$=.minActDate]').val();
+	var maxEndDate = $('input[id$=.maxActDate]').val();
+	if(!compareDate(minEndDate, maxEndDate, '统计日期范围不合理')){
+		return;
+	}*/ 
+	smartForm_doRefresh(obj);
+}

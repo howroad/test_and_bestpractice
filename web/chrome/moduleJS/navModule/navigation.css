@@ -1,0 +1,86 @@
+
+/*顶部导航样式*/
+.top-nav-bar {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 46px;
+    background-color: #ECF0F7;
+    border-bottom: 1px solid #C8C8C8;
+    overflow: hidden;
+    z-index: 10000;
+}
+/*导航图标*/
+.page-nav-icon {
+    float: left;
+    margin-left: 14px;
+    margin-top: 7px;
+    width: 32px;
+    height: 32px;
+}
+/*导航*/
+.page-nav-name {
+    float: left;
+    font-family: "STHeitiSC Medium","Microsoft YaHei", "宋体", "Arial", "Helvetica";
+    font-size: 18px;
+    color: #404a54;
+    line-height: 46px;
+    text-indent: 5px;
+}
+/*预留区*/
+.page-nav-center {
+    float: left;
+    margin-left: 50px;
+    line-height: 46px;
+    overflow: hidden;
+}
+/*全局按钮*/
+.page-nav-btn {
+    position: absolute;
+    right: 10px;
+    background-color: #ECF0F7;
+    padding-top: 12px;
+    overflow: hidden;
+}
+.page-btn input {
+    margin-left: 20px;
+}
+
+/*底部导航样式*/
+.bottom-nav-bar {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 40px;
+    background-color: #ECF0F7;
+    border-top: #C8C8C8;
+    overflow: hidden;
+    z-index: 10000;
+}
+.page-nav-icon-bottom {
+    float: left;
+    display: none;
+}
+.page-nav-name-bottom {
+    float: left;
+    display: none;
+}
+.page-nav-center-bottom {
+    float: left;
+    display: none;
+}
+.page-nav-btn-bottom {
+    text-align: right;
+    padding-top: 8px;
+}
+.page-nav-btn-center {
+    text-align: center;
+    padding-top: 8px;
+}
+.page-nav-btn-center input {
+    background: none;
+    padding-left: 10px;
+    border-left: 2px solid #c8c8c8;
+}

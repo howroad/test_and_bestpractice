@@ -1,0 +1,38 @@
+$(function(){
+	var currencyName=$('[id$=".currencyName"]').val();
+	if(currencyName==''){
+		var currencyNos=$('[id=gdt_staticsFinaceBank_list.currencyName]');
+		for(var i=0;i<currencyNos.length;i++){
+			$(currencyNos[i]).parent().html('折人民币<input name="gdt_staticsFinaceBank_list.currencyName"></input>');
+		}
+	}
+	var includeEnd = $('input[id$=.includeEnd]').val()
+	if(includeEnd == '0'){
+		$('input[id$=.el]').attr('checked', true);
+	} else {
+		$('input[id$=.el]').attr('checked', false);
+	}
+});
+
+function showFinaceContract(cltNo, bankNo, currencyNo){
+	var actDate = $('input[id$=.actDate]').val();
+	var includeEnd = $('input[id$=.includeEnd]').val();
+	var bussVariety = $('select[id$=.bussVariety]').val();
+	var bankNoIsNull = bankNo == '' ? "bankNoIsNull" : '';
+	var url = 'GDEBIT@gdt_finaceContract.sf?m=e&cltNo=' + cltNo 
+	          + '&bankNo=' + bankNo 
+	          + '&bankNoIsNull=' + bankNoIsNull 
+	          + '&currencyNo=' + currencyNo
+			  + '&actDate=' + actDate
+			  + '&includeEnd=' + includeEnd
+			  + '&bussVariety=' + bussVariety;
+	openwin(url, '合同列表', 1000, 700);
+}
+
+function setIncludeEnd(obj){
+	if(obj.checked){
+		$('input[id$=.includeEnd]').val('0');
+	} else {
+		$('input[id$=.includeEnd]').val('');
+	}
+}

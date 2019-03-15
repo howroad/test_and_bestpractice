@@ -1,0 +1,15 @@
+/**
+ * 
+ */
+function doRefsh(obj){
+	var currencyNo = $('select[id$="currencyNo"]').val();
+	if(currencyNo == null||currencyNo==''){
+		alert("«Îœ»—°‘Ò±“÷÷");	
+	}else{
+	smartForm_doRefresh(obj);
+	}
+}
+function doChange(obj){
+	var objBtn = document.getElementById("gdt_limitByAmount_qry.refresh");
+	objBtn.onclick();
+}

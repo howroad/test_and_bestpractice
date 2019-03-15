@@ -1,0 +1,115 @@
+$(function(){
+	if($('input[id$="m"]').val()=='v'){
+		//$('div[id$="_reason"]').hide();
+		$('div[id$="_log"]').show();
+		$('font').html('');
+		$('select[id$="changeType_bak"]').val($('input[id$="changeType"]').val());
+		$('input[id$="changeAmount_bak"]').val($('input[id$="changeAmount"]').val());
+	}else{
+		$('div[id$="_log"]').hide();
+	}
+	
+	var guaranteeType = $("input[id$='guaranteeType']").val();
+	if(guaranteeType != 'G01'&&guaranteeType != 'G05'&&guaranteeType != 'G04'){
+		$("select[id$='changeType_bak']").attr("value","2");
+		$("select[id$='changeType_bak']").find("option[value='"+2+"']").attr("selected",true);
+		$("select[id$='changeType_bak']").attr({"disabled":true});
+		
+		var useAmount = $('input[id$=.useAmount]').val();
+		var rate = $("[id$='.rate']").val();
+		var amount = parseFloat(useAmount.replace(/,/g,''))/parseFloat(rate);
+		$('input[id$=.changeAmount_bak]').val(FormatMoney(amount,2)).attr({"disabled":true});
+		var obj = $("input[id$='tarAmount']").val(useAmount);
+		obj.parent().html(useAmount).append(obj);
+	}
+	
+});
+
+
+function changeTypeAmount(obj){
+	var tr = nstc.sf.findParent(obj, 'tr');
+	var changeType = $(tr).find('select[id$=.changeType_bak]').val();
+	var useAmount = $(tr).find('input[id$=.useAmount]').val();
+	var rate = $(tr).find("[id$='.rate']").val();
+	var amount = parseFloat(useAmount.replace(/,/g,''))/parseFloat(rate);
+	if(changeType == 2){
+		$(tr).find('input[id$=.changeAmount_bak]').val(FormatMoney(amount,2)).attr({"disabled":true});
+		setInfo4InputAndSpan($(tr),"tarAmount",useAmount,useAmount);
+	}else{
+		$(tr).find('input[id$=.changeAmount_bak]').val("").attr({"disabled":false});
+		setInfo4InputAndSpan($(tr),"tarAmount","","");
+	}
+}
+
+function doEntrySubmit(obj){
+	var changeType = $('select[id$="changeType_bak"]').val();
+	var changeAmount = $('input[id$="changeAmount_bak"]').val();
+	var actDateStr = $('input[id$=".actDate"]').val();
+	if(actDateStr==''||actDateStr==null){
+		alert("变更日期不能为空");
+		return;
+	}
+	var actDate = new Date(actDateStr.replace("-", "/").replace("-", "/"));
+	var nowDate = new Date();
+	if(actDate>nowDate){
+		alert("变更日期不能大于当前日期");
+		return;
+	}
+	var startDate = $("[id$='_list.startDate']").val();
+	var endDate = $("[id$='_list.endDate']").val();
+	if(actDateStr<startDate||actDateStr>endDate){
+		alert("变更日期必须在开始日（"+startDate+"）与到期日（"+endDate+"）之间");
+		return;
+	}
+	//释放
+	if(changeType == 1){
+		var useAmount = $('input[id$="useAmount"]').val().excludeNotNumericDot();
+		var changeAmount = $('input[id$="changeAmount_bak"]').val().excludeNotNumericDot();
+		if(parseFloat(changeAmount)>parseFloat(useAmount)){
+			alert('释放额度大于占用额度，占用额度为：'+$('input[id$="useAmount"]').val());
+			return;
+		}
+	}
+	
+	$("input[id$='.changeType']").val(changeType);
+	$("input[id$='.changeAmount']").val(changeAmount);
+	
+	smartForm_doSave(obj);
+}
+
+//点击确定操作
+function smartForm_confirm_true(){
+	//$("#父窗口元素ID",window.parent.document);
+	var objbut = top.Layer.getWin().document.getElementById("gdt_guaChange_qry.refresh");
+	var objbut2 = top.Layer.getWin().document.getElementById("gdt_guaChangeWait_qry.refresh");
+	if(objbut){
+		objbut.click();
+		windowClose();
+		return;
+	}
+	if(objbut2){
+		objbut2.click();
+		windowClose();
+		return;
+	}
+} 
+
+function smartForm_confirm(msg) {
+	alert(msg);
+    smartForm_confirm_true();
+}
+/**变更额度发生改变 add by nj*/
+function changeAmount(obj){
+	var tr = $(obj).closest("tr");
+	var changeAmount = $(obj).val();
+	var rate = tr.find("[id$='rate']").val();
+	var tarAmount = parseFloat(changeAmount.replace(/,/g,''))*parseFloat(rate);
+	setInfo4InputAndSpan(tr,"tarAmount",FormatMoney(tarAmount,2),FormatMoney(tarAmount,2));
+}
+
+//处理驳回全额释放时, 在待处理记录页面修改可以改变金额的问题
+$(function(){
+	if($("[id$='.changeType_bak']").val()=="2"){
+		$("[id$='.changeAmount_bak']").attr("disabled", "disabled");
+	}
+});

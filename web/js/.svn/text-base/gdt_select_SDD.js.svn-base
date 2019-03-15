@@ -1,0 +1,11 @@
+//跳转到选择押汇单据页面，根据信用证类别选择币种 add by liyang 20180802 
+//$(function(){
+//	var credit = $('[id$=.credit]').val();
+//	if(credit==2){
+//		$('[id$=.currencyNo]').val('CNY');
+//		$('[id$=.currencyNo]').attr('disabled','true');
+//		
+//	}else{
+//		$('[id$=.currencyNo]').removeAttr('disabled');
+//	}
+//})

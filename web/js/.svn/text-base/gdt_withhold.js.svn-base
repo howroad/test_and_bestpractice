@@ -1,0 +1,94 @@
+$(function() {
+	var date = new Date();// 默认为当天
+	var year = date.getFullYear();
+	var month = date.getMonth() + 1;
+	var day = date.getDate();
+	if (month < 10) {
+		month = "0" + month;
+	}
+	if (day < 10) {
+		day = "0" + day;
+	}
+	var gdt = $("[id$=gdt_withhold_apply_qry.withHoldDate]").val();
+	if (isNull(gdt)) {
+		$("[id$=gdt_withhold_apply_qry.withHoldDate]").val(year + "-" + month + "-" + day);
+	}
+});
+//打开预提明细界面
+function openWithholdDetail(obj){
+	var formerBussId=$(obj).parents("tr");
+	var fetchRegId=$(obj).parents("tr").find("input[id$='.fetchRegId']").val();
+	
+	var sDate = $(obj).parents("tr").find("input[id$='.startDate']").val();
+	var eDate = $(obj).parents("tr").find("input[id$='.endDate']").val();
+	var bussVariety = $(obj).parents("tr").find("input[id$='gdt_withhold_apply_list.bussVariety']").val();
+	//alert("bussVariety:"+bussVariety);
+	
+	if(bussVariety == 'CLMS28'){
+		window.open('GDEBIT@gdt_withhold_asset_detail.sf?m=v&fetchRegId='+fetchRegId+'&sDate='+sDate+'&eDate='+eDate, '预提明细', 'width=550, height=350');	
+	}else{
+		//获取产品种类是否是资产证券化打开不同的页面
+		window.open('GDEBIT@gdt_withhold_detail.sf?m=v&fetchRegId='+fetchRegId+'&sDate='+sDate+'&eDate='+eDate, '预提明细', 'width=550, height=350');	
+	}
+	
+	//必需：打开窗口后设置openPage，避免在google中无法获取到父页面方法
+	//window.openPage = "GDEBIT@gdt_withhold_detail.sf";
+}
+
+function doWithHold(obj){
+	var checkNum = getCheckNum();
+	if (checkNum == 0) {
+		alert("至少选择一条记录！");
+		return;
+	}
+	if (confirm("预提利息提交成功后传NC")) {
+		smartForm_doSubmit(obj);
+	}
+}
+function doWithHold4Advance(obj){
+	var checkNum = getCheckNum();
+	if (checkNum == 0) {
+		alert("至少选择一条记录！");
+		return;
+	}
+	if (confirm("对所选预提记录进行冲预提？")) {
+		smartForm_doSubmit(obj);
+	}
+}
+
+//获取选中的行
+function getCheckNum(){
+	var checkObj = $("[id$=._chk]:visible");
+	var checkNum = 0;
+	for ( var i = 0; i < checkObj.length; i++) {
+		if (checkObj[i].checked) {
+			checkNum++;
+		}
+	}
+	return checkNum;
+}
+function doRefresh(obj){
+	var  withHoldDate = $("[id$=gdt_withhold_apply_qry.withHoldDate]").val();
+	//alert(withHoldDate);
+	if(isNull(withHoldDate)){
+		alert("预提日期不能为空");
+	}else{
+		smartForm_doRefresh(obj);
+	}
+} 
+
+function clickchk(obj) {
+	nstc.sf.clickCheckbox(obj);
+}
+
+function changeSelectedCounts(obj) {
+	smartForm_all_checkbox(obj, 'gdt_withhold_apply_list._chk');
+}
+
+//判断是否为空
+function isNull(a){
+	  if(a == "" || a == null || a == undefined){ // "",null,undefined
+	       return true;
+	    }
+	  return false;
+}

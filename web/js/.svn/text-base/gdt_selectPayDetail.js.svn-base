@@ -1,0 +1,43 @@
+function doRefresh(obj){
+	var minAmount = $('input[id$=.minAmount]').val();
+	var maxAmount = $('input[id$=.maxAmount]').val();
+	var minDate = $('input[id$=.minDate]').val();
+	var maxDate = $('input[id$=.maxDate]').val();
+	if(!compareAmount(minAmount, maxAmount, '合同金额范围不合理')){
+		return;
+	} 
+	if(!compareDate(minDate, maxDate, '日期范围不合理')){
+		return;
+	} 
+	smartForm_doRefresh(obj)
+}
+function callBack(obj){
+	var attrId=$(obj).html();
+	var num=$('input[id$="num"]').val();
+	var tr=$(obj).parents('tr').first();
+	var curCode=tr.find('[id$="curCode"]').val();
+	var lsh=tr.find('[id$="lsh"]').val();
+	var associateBankName=tr.find('[id$="associateBankName"]').val();
+	var payDate=tr.find('[id$="payDate"]').val();
+	var attrAmount=tr.find('[id$="attrAmount"]').val();
+	var propNo=tr.find('[id$="propNo"]').val();
+	var propName=tr.find('[id$="propName"]').val();
+	var recName=tr.find('[id$="recName"]').val();
+	var explain=tr.find('[id$="explain"]').val();
+	var recordId=tr.find('[id$="payId"]').val();
+	var result={};
+	result.attrId=attrId;
+	result.curCode=curCode;
+	result.lsh=lsh;
+	result.associateBankName=associateBankName;
+	result.payDate=payDate;
+	result.attrAmount=attrAmount;
+	result.propNo=propNo;
+	result.propName=propName;
+	result.recName=recName;
+	result.explain=explain;
+	result.num=num;
+	result.recordId=recordId;
+	top.Layer.getWin().setPayDetail(result);
+	windowClose();
+}

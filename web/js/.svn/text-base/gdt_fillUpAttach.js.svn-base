@@ -1,0 +1,253 @@
+//附件类型
+var fileTypeStr="";
+//已保存附件条数
+var oldNum=0;
+
+$(function (){
+	//将显示的附件类型改为只读
+	var fileTypes = $("[id$=.fileType]");
+	oldNum = fileTypes.length - 1;
+	for ( var i = 0; i < fileTypes.length - 1; i++) {
+		var obj = fileTypes.get(i);
+		var index = obj.selectedIndex;
+		if(index != null && index != "undefined" && index != ""){
+			var text = obj.options[index].text;
+			var value = obj.options[index].value;
+			fileTypeStr = fileTypeStr + "," + value;
+			var td = fileTypes.get(i).parentNode.parentNode;;
+			td.innerHTML="<span>" + text +
+				"<input name=\"gdt_fileUploadPage_list.fileType\" id=\"gdt_fileUploadPage_list.fileType\" " +
+				"type=\"hidden\" value=\""+ text +"\"></span>";
+		}
+	}
+	
+	//删除附件选择框及删除按钮
+	var fileuploads = $("[id$=.fileuploads]");
+	for ( var i = 0; i < fileuploads.length - 1; i++) {
+		var obj = fileuploads.get(i);
+		var div = nstc.sf.findParent(obj,"DIV");
+		var span = nstc.sf.findParent(div,"SPAN");
+		var aLabels = span.getElementsByTagName('a');
+		if(aLabels.length > 2){
+			aLabels[2].parentNode.removeChild(aLabels[2]);
+		}
+	}
+	//隐藏附件选择框
+	for ( var i = 0; i < fileuploads.length - 1; i++) {
+		var obj = fileuploads.get(i);
+		var div = nstc.sf.findParent(obj,"DIV");
+		var span = nstc.sf.findParent(div,"SPAN");
+		if(span != null){
+			span.removeChild(div);
+		}
+	}
+	
+	
+})
+
+/**
+ * 文件上传控件处理
+ */
+function fileuploadsHandle(obj) {
+	smartForm_add(obj);
+	//新增一行后的处理
+	var fileUploads = $("[id$=.fileUploads_hide]");
+	var obj = fileUploads.get(fileUploads.length - 1);
+	var td = nstc.sf.findParent(obj,"TD");
+	td.innerHTML="<SPAN>" +
+			"<DIV id=1>" +
+			"	<INPUT id='gdt_fileUploadPage_list.fileuploads_filetext' class='inputFile-txt' readOnly name='gdt_fileUploadPage_list.fileuploads_filetext' type='text'>" +
+			"	<SPAN onclick='click_file(this)' class='fileInput'>" +
+			"		<INPUT onchange='smartForm_file(this)'; id='gdt_fileUploadPage_list.fileuploads' class='button35 button' alt='附件' type='file' name='gdt_fileUploadPage_list.fileuploads' >" +
+			"	</SPAN>" +
+			"</DIV>" +
+			"</SPAN>";
+	
+}
+
+
+var isCommitted = false;//表单是否已经提交标识，默认为false
+var isDeleted = false;//表单是否已经提交删除标识，默认为false
+
+/*
+ * 提交页面
+ * */
+function submitCurPage(obj){
+
+	//附件验证
+	if(!attachUploadValidate()){
+		return;
+	}
+	//附件补传控制验证
+	if(!checkFileUploadControl('011')){
+		return;
+	}
+	if(!isCommitted){
+		smartForm_doSubmit(obj);
+		isCommitted = true;
+	}
+	
+}
+
+/**
+ * 删除附件（已弃用）
+ */
+function deleteAttachFile(){
+	if(isDeleted){
+		return;
+	}
+	var deleteNum=0;
+	var pageCode = $("[id$='pageCode']").val() + ".sf?";
+	var list=$('div[id$="gdt_fileUploadPage_list"]');
+	var checks=list.find('input[id$="_check"]:checked');
+	if(checks==undefined || checks.length==0){
+		alert("至少选择一条数据！");
+		return;
+	}
+	for ( var j = 0; j < checks.length; j++) {
+		var tr = $(nstc.sf.findParent(checks.get(j),"TR"));
+		var currentUser = tr.find("input[id$='currentUser']").val();
+		var uploadPerson = tr.find("input[id$='uploadPerson']").val();
+		if(currentUser != uploadPerson){
+			alert("仅能删除自己上传的附件！");
+			return;
+		}
+	}
+	for ( var j = 0; j < checks.length; j++) {
+		var tr = $(nstc.sf.findParent(checks.get(j),"TR"));
+		var fileId = tr.find("input[id$='fileId']").val();
+		var isApply = tr.find("input[id$='isApply']").val();
+		var lastBackUrl = tr.find("input[id$='lastBackUrl']").val();
+		var contractNo = tr.find("input[id$='contractNo']").val();
+		var bussFileId = tr.find("input[id$='bussFileId']").val();
+		var backUrl = "GDEBIT@" + pageCode + lastBackUrl;
+		$.post("GDEBIT@gdtFileDelete.sf", {
+			'fileId':fileId,
+			'isApply':isApply,
+			'deleteFile':'true',
+			'backUrl':backUrl,
+			'bussFileId':bussFileId,
+			'contractNo':contractNo,
+			'_delflag':'del'
+		}, function(data) {
+			oldNum--;
+			deleteNum++;
+			$(checks).each(function(){
+				nstc.sf.delCurrRow(this)
+			});
+			if(deleteNum == checks.length){
+				alert("删除成功！");
+			}
+		});
+	}
+	isDeleted = true;
+}
+
+/**
+ * 删除附件
+ */
+function deleteAttachFileSpecial(obj){
+	if(isDeleted){
+		return;
+	}
+	var deleteNum=0;
+	var pageCode = $("[id$='pageCode']").val() + ".sf?";
+	var list=$('div[id$="gdt_fileUploadPage_list"]');
+	var checks=list.find('input[id$="_check"]:checked');
+	if(checks==undefined || checks.length==0){
+		alert("至少选择一条数据！");
+		return;
+	}
+	for ( var j = 0; j < checks.length; j++) {
+		var tr = $(nstc.sf.findParent(checks.get(j),"TR"));
+		var currentUser = tr.find("input[id$='currentUser']").val();
+		var uploadPerson = tr.find("input[id$='uploadPerson']").val();
+		if(currentUser != uploadPerson){
+			alert("仅能删除自己上传的附件！");
+			return;
+		}
+	}
+	smartForm_doSubmit(obj);
+}
+
+/**
+ * 检查附件上传控制
+ */
+function checkFileUploadControl(obj){
+	var check = 0;
+	var div = $("div[id$='div.gdt_fileUploadPage_list']");
+	if(div == null || div == "undefined" || div == ""){
+		return;
+	}
+	var dataNew = obj + fileTypeStr;
+	div.find("[id$='fileType']").each(function(i,el){
+		if(i > oldNum && $(el).val() != ''){
+			dataNew = dataNew + ',' + $(el).val();
+		}
+	});
+	$.ajaxSettings.async = false;
+	$.post("GDEBIT@gdtFileUploadControlAction.sf", {
+		'dataNew':dataNew
+	}, function(data) {
+		if(data != null && data != ""){
+			alert(data);
+			check = 1;
+			return false;
+		}
+	});
+	if(check == 1){
+		return false;
+	} else {
+		return true;
+	}
+};
+
+/**
+ * 附件保存时校验
+ *  附件和附件类型不能同时为空
+ */
+function attachUploadValidate(){
+	 
+	 var files = $("input[id$='fileuploads_filetext']");
+	 var fileTypes = $("select[id$='fileType']");
+	 
+	 if(files.length==0){
+		 alert("无可上传数据");
+		 return false;
+	 }
+	 for(var i = 0; i < files.length; i++){
+		 var file = files.get(i).value;
+		 var index = fileTypes.get(i+1).selectedIndex;
+		 var value = fileTypes.get(i+1).options[index].value;
+		 if(file == "" && value == ""){
+			 alert("附件名称和附件类型不能为空！");
+			 return false;
+		 }
+		 if(file != null && file != ""){
+			 if(value == null || value == ""){
+				 alert("附件类型不能为空！");
+				 return false;
+			 }
+		 }
+		 if(value != null && value != ""){
+			 if(file == null || file == ""){
+				 alert("请选择附件！");
+				 return false;
+			 }
+		 }
+		 if(getLength(file) > 100){
+			 alert("附件名称超出定义的最大长度！");
+			 return false;
+		 }
+	 }
+	 return true;
+}
+
+/**
+ * 计算字符串长度(中文占两个字符)
+ * @param str
+ * @returns
+ */
+function getLength(str){
+	return str.replace(/[\u0391-\uFFE5]/g,"aa").length;
+}

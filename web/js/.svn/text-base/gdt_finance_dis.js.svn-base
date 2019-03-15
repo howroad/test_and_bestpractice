@@ -1,0 +1,487 @@
+$(function(obj){
+	
+	var bussClass = $("[id$=.bussVariety]").val();
+	if(bussClass=='CLMS11'){
+	var principalMethod=$("[id$=.principalMethod]").val();
+	if (principalMethod==2){
+		$("input[id$=.buyIntrCltName]").hide();
+		$("input[id$=.buyIntrCltName]").val(" ");
+		$("input[id$=.sellIntrScale]").val(100).attr('readonly','readonly');
+	}else if (principalMethod==1){
+		$("input[id$=.buyIntrCltName]").show();
+		$("input[id$=.sellIntrScale]").val(0).attr('readonly','readonly');
+	}else if(principalMethod==3){
+		$("input[id$=.buyIntrCltName]").show();
+		$("input[id$=.sellIntrScale]").removeAttr('readonly');
+	}
+	calSellIntrAmount();
+	/*if(amount!=null&&amount!=""){
+		var sellIntrScale =$("input[id$=.sellIntrScale]").val();
+		var sellIntrAmount= sellIntrScale
+		//$("[id$=.sellIntrAmount]").
+	}*/
+	var sellIntrScale =  $("[id$='_info.sellIntrScale']").val();
+	 var sellIntrScaleStr = sellIntrScale == 0 ? '0.00' : FormatMoney(sellIntrScale,2);
+	    $("[id$='_info.sellIntrScale']").val(sellIntrScaleStr);
+	}
+	$("input[id$=.isTakeCredit]").val(0);
+	$("input[id$=.isTakeGuarantee]").val(0);
+});
+//校验卖方付息比例
+function checkSellIntrScale(){
+	
+    var sellIntrScale =  $("[id$='_info.sellIntrScale']").val();
+    var principalMethod =  $("[id$='_info.principalMethod']").val();
+    var regEn = /[`~!@#$%^&*()_+<>?:"{},\/;'[\]]/im;
+    var regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】[\]]/im;
+
+    if(regEn.test(sellIntrScale) || regCn.test(sellIntrScale)) {
+    	$("[id$='_info.sellIntrScale']").val("");
+    	/*$("[id$='_info.endDateShow']").val("");
+    	$("[id$='_info.endDate']").val("");*/
+    	return false ;
+    }
+   /* if(sellIntrScale=='0'&&principalMethod!='1'){
+    	alert("卖方付息比例必须大于0！");
+    	$("[id$='_info.sellIntrScale']").val("");
+    	$("[id$='_info.endDateShow']").val("");
+    	$("[id$='_info.endDate']").val("");
+    	return false;
+    }*/
+    if(sellIntrScale<0){
+    	alert("卖方付息比例不能小于0！");
+    	$("[id$='_info.sellIntrScale']").val("");
+    	$("[id$='_info.endDateShow']").val("");
+    	$("[id$='_info.endDate']").val("");
+    	return false;
+    }
+    if(sellIntrScale>100){
+    	alert("卖方付息比例必须不大于100%！");
+    	$("[id$='_info.sellIntrScale']").val("");
+    	/*$("[id$='_info.endDateShow']").val("");
+    	$("[id$='_info.endDate']").val("");*/
+    	return false;
+    }
+    var sellIntrScaleStr = sellIntrScale == 0 ? '0.00' : FormatMoney(sellIntrScale,2);
+    $("[id$='_info.sellIntrScale']").val(sellIntrScaleStr);
+    return true;
+}
+function countBillAmt(){
+	
+	var daysInWayArray = $("input[id$='_bill.daysInWay']");
+	if(!daysInWayArray){
+		return;
+	}
+	for(var i = 0; i < daysInWayArray.length; i++){
+		countIntrDays(daysInWayArray[i]);
+	}
+	countBillNum();
+}
+//校验貼現利率
+function checkDisRate(obj){
+	var rate = $(obj);
+	if(rate.val() !=''){
+		if(100.0-parseFloat(rate.val().excludeNotNumericDot())<0){
+			alert("利率值不能超过100");
+			rate.val('');
+		} else if (parseFloat(rate.val().excludeNotNumericDot()) <= 0.0) {
+			alert("利率值必须大于0");
+			rate.val('');
+		}
+	}
+	//重新计算票据贴现金额及合同金额
+	countBillAmt();
+}
+function countIntrDays(obj){
+	var num = obj.value;
+	num = num.excludeNotNumericDot();
+	if(num == ""){
+		obj.value = 0;
+	}else {
+	   obj.value = num;	
+	}
+	
+	var tr = $(obj).closest("tr");
+	var pageCode = $("input[id='pageCode']").val();
+	var intrBase = $('[id$=_info.interestAccDay]').val();
+	var payIntrModeEle =$('[id$=_info.disIntrPayMode]').get(0);
+	if(!payIntrModeEle){
+		payIntrModeEle = $('[id$=_info.principalMethod]').get(0);
+	}
+	var payIntrMode = payIntrModeEle.value;
+	var daysInWay = tr.find("input[id$='.daysInWay']").val().excludeNotNumericDot();
+	var deferDays = tr.find("input[id$='.deferDays']").val().excludeNotNumericDot();
+	var billAmount = tr.find("input[id$='.billAmount']").val().excludeNotNumericDot();
+	var disRate = $("input[id$='_info.capitalRate']").val().excludeNotNumericDot();
+	var disStartDate = $("input[id$='_info.startDate']").val();
+	var disEndDate = tr.find("input[id$='_bill.endDate']").val();
+	if(!disEndDate){
+		return;
+	}
+	var dayNum1 = dateDiff(disStartDate, disEndDate);
+	var dayNum = dayNum1 + Number(daysInWay) + Number(deferDays);
+//	var discountAmount = billAmount;
+	var countIntrAmt = FormatNumber(FormatNumber(billAmount, 4)-FormatNumber(billAmount*dayNum*FormatNumber(disRate, 6)/intrBase/100, 4));
+//	if("2"==payIntrMode){
+	var	discountAmount = countIntrAmt;
+//	}
+	tr.find("input[id$='.discountAmount']").val(discountAmount);
+	tr.find("input[id$='.countIntrAmt']").val(countIntrAmt);
+	var discountAmountHtml  = tr.find("input[id$='.discountAmount']")[0].outerHTML;
+	tr.find("input[id$=.discountAmount]").closest("td").find("span")[0].innerHTML=FormatMoney(discountAmount,2) + discountAmountHtml;
+	
+	tr.find("input[id$='.dayNum']").val(dayNum);
+    var dayNumHtml  = tr.find("input[id$='.dayNum']")[0].outerHTML;
+	tr.find("input[id$=.dayNum]").parent().html(dayNum + dayNumHtml);
+	//更新表头金额统计
+	countBillNum();
+	
+	calSellIntrAmount();
+}
+//计算期限
+function setDisTermDay(){
+	
+	var idVal = $("input[id$='_info.cltNo']").attr("id");
+    var pageCode = idVal.replace(/.cltNo/,"");
+	var startDate = $('input[id$=.startDate]').val();
+	var endDate = $('input[id$=.endDate]').val();
+	if(startDate != '' && endDate != ''){
+		var termDay = DateCompare(startDate,endDate);
+		var html  = "<input id='" + pageCode + ".termDay' name='" + pageCode + ".termDay' type='hidden' value='"+termDay+"'/>"
+		//$('input[id$=.termDay]').parent().html(termDay  + html);
+		//$('input[id$=.termDay]').val(termDay);
+		var typeHtml  = "<input id='" + pageCode + ".termDayType' name='" + pageCode + ".termDayType' type='hidden' value='"+1+"'/>"
+		//$("[id$='.termDayType']").parent().remove();
+		$('input[id$=.termDay]').parent().html(termDay/*+"日"*/+ html/*+typeHtml*/);
+		/*$('[id$=_info.termDayType]').parent().hide();
+		
+		$('[id$=_info.termDayType]').val(1);*/
+	}
+	countBillAmt();
+}
+//选择票据贴现
+function showBillDiscMsg(obj){
+	var tr = $(nstc.sf.findParent(obj,"TR"));
+	var wbId = tr.find("input[id$=.billId]").val();
+	var url = "BMMS@showDraftInfoDetail.sf?m=v&wbId=" + wbId;
+	openwin(url, '票据详情', 800, 500);
+}
+function changeRateMode(){
+//	var pageCode = $("input[id='pageCode']").val();
+//	var payIntrModeEle = document.getElementById(pageCode + '_info.disIntrPayMode');
+//	if(!payIntrModeEle){
+//		payIntrModeEle = document.getElementById(pageCode + '_info.principalMethod');
+//	}
+//	var payIntrMode = payIntrModeEle.value;
+//	if("2"==payIntrMode){
+//		var countIntrAmtArray = $("input[id$='_bill.countIntrAmt']");
+//		for(var i = 0; i < countIntrAmtArray.length; i++){
+//			var amt = countIntrAmtArray[i].value;
+//			var tr = $(countIntrAmtArray[i]).closest("tr");
+//			tr.find("input[id$='.discountAmount']").val(amt);
+//			var discountAmountHtml  = tr.find("input[id$='.discountAmount']")[0].outerHTML;
+//			tr.find("input[id$=.discountAmount]").closest("td").find("span")[0].innerHTML=FormatMoney(amt,2) + discountAmountHtml;
+//		}
+//	}else{
+//		var billAmtArray = $("input[id$='_bill.billAmount']");
+//		for(var i = 0; i < billAmtArray.length; i++){
+//			var amt = billAmtArray[i].value;
+//			var tr = $(billAmtArray[i]).closest("tr");
+//			tr.find("input[id$='.discountAmount']").val(amt);
+//			var discountAmountHtml  = tr.find("input[id$='.discountAmount']")[0].outerHTML;
+//			tr.find("input[id$=.discountAmount]").closest("td").find("span")[0].innerHTML=FormatMoney(amt,2) + discountAmountHtml;
+//		}
+//	}
+	
+	var principalMethod =  $("select[id$='_info.principalMethod']").val();
+	var buyIntrCltName=$("input[id$=.buyIntrCltName]").val();
+	if(principalMethod==2){
+		$("input[id$=.buyIntrCltName]").val(" ");
+		$("input[id$=.buyIntrCltName]").hide();
+		$("input[id$=.sellIntrScale]").val(100).attr('readonly','readonly');
+	}else if (principalMethod==1){
+		$("input[id$=.buyIntrCltName]").show();
+		$("input[id$=.sellIntrScale]").val(0).attr('readonly','readonly');
+		if(buyIntrCltName==" "){
+			$("input[id$=.buyIntrCltName]").val("");
+		}
+	}else if(principalMethod==3){
+		$("input[id$=.buyIntrCltName]").show();
+		$("input[id$=.sellIntrScale]").removeAttr('readonly');
+		$("input[id$=.sellIntrScale]").val(0);
+		if(buyIntrCltName==" "){
+			$("input[id$=.buyIntrCltName]").val("");
+		}
+	}
+}
+function setInfoEndDate(){
+	var infoEDate = '';
+	var disEDateArray = $("input[id$='_bill.endDate']");
+	for(var i = 0; i < disEDateArray.length; i++){
+		var endDate = disEDateArray[i].value;
+		if(!infoEDate){
+			if(endDate){
+				infoEDate = endDate;
+			}
+		}else{
+			if(DateCompare(infoEDate, endDate) > 0){
+				infoEDate = endDate;
+			}
+		}
+	}
+	$("input[id$='_info.endDate']").val(infoEDate);
+	$('input[id$=.endDateShow]').removeAttr('disabled');
+	$('input[id$=.endDateShow]').val(infoEDate)
+	$('input[id$=.endDateShow]').attr('disabled','true');
+	/*var conEndDateHtml = $("input[id$='_info.endDate']")[0].outerHTML;
+	$('input[id$=_info.endDate]').parent().html(infoEDate + conEndDateHtml);*/
+	setDisTermDay();
+}
+function countContractAmt(){
+	var conAmt = 0;
+	var disAmtArray = $("input[id$='_bill.billAmount']");
+	for(var i = 0; i < disAmtArray.length; i++){
+		conAmt += Number(disAmtArray[i].value.excludeNotNumericDot());
+	}
+	//var pageCode = $("input[id='pageCode']").val();
+	var idVal = $("input[id$='_info.cltNo']").attr("id");
+    var pageCode = idVal.replace(/.cltNo/,"");
+	var conAmtHtml  = "<input id='"+pageCode+".amount' name='"+
+		pageCode+".amount' type='hidden' value='"+conAmt+"'/>";
+	$("input[id$=.amount]").parent().html(FormatMoney(conAmt,2) + "元" + conAmtHtml);
+}
+function setBillDisc(arrObj){
+	var pageCode = $("input[id='pageCode']").val();
+	if(pageCode=="gdt_ameBillDisc"){
+		pageCode="gdt_conBillDisc";
+	}
+	var payIntrModeEle = document.getElementById(pageCode + '_info.disIntrPayMode');
+	if(!payIntrModeEle){
+		payIntrModeEle = document.getElementById(pageCode + '_info.principalMethod');
+	}
+	var payIntrMode = payIntrModeEle.value;
+	for ( var i = 0; i < arrObj.length; i++) {
+		var data = arrObj[i];
+		var btnAdd = $("input[id$='_bill.add']")[0];
+		
+		var billNo = data.billNo;
+		//重复选择的票不回显
+		var billNos=$("input[id$='_bill.billNo']");
+		var checkFlag=0;
+		for(var j=0;j<billNos.length;j++){
+			var havedBill=billNos[j].value;
+			if (havedBill==billNo){
+				checkFlag++;
+			}
+		}
+		if(checkFlag>0){
+			continue;
+		}
+		
+		var tr_row = smartForm_add(btnAdd);
+		var tr = $(tr_row);
+		
+		tr.find("input[id$='.billId']").val(data.billId);
+		//tr.find("input[id$='.billAmount']").val(data.billAmount);
+		
+		
+		//var billType = data.billType;
+		var startDate = data.startDate;
+		var endDate = data.endDate;
+		var billAmount = data.billAmount;
+		//var accBankName = data.accBankName;
+		var payee = data.payee;
+		var recAccount = data.recAccount;
+
+		//var discountDate = data.discountDate;
+		//var discountRate = data.discountRate;
+		//计息基数360、365
+		var intrBase = document.getElementById(pageCode + '_info.interestAccDay').value;
+		var disRate = $("input[id$='_info.capitalRate']").val();
+		var discDate = $('input[id$=_info.startDate]').val();
+		var dayNum = DateCompare(discDate, endDate);
+//		var dayNum = $("input[id$='_info.termDay']").val();
+//		var discountAmount = billAmount;
+		var countIntrAmt = FormatNumber(billAmount)-FormatNumber(billAmount*dayNum*FormatNumber(disRate)/intrBase/100);
+//		if("2"==payIntrMode){
+		var	discountAmount = countIntrAmt;
+//		}
+		//var pageCode = $("input[id$='pageCode']").val();
+		var amountHtml  = "<input id='"+pageCode+"_bill.billAmount' name='"+
+		pageCode+"_bill.billAmount' type='hidden' value='"+billAmount+"'/>";
+		tr.find("input[id$=_bill.billAmount]").parent().html("<span style ='text-align: right; font-weight: bold;'>"+FormatMoney(billAmount,2)+"</span>"
+				+amountHtml);
+		
+		var discountAmountHtml  = "<input id='"+pageCode+"_bill.discountAmount' name='"+
+		pageCode+"_bill.discountAmount' type='hidden' value='"+discountAmount+"'/>";
+		var countIntrAmtHtml  = "<input id='"+pageCode+"_bill.countIntrAmt' name='"+
+		pageCode+"_bill.countIntrAmt' type='hidden' value='"+countIntrAmt+"'/>";
+		tr.find("input[id$=_bill.discountAmount]").parent().html("<span style ='text-align: right; font-weight: bold;'>"+FormatMoney(discountAmount,2)+"</span>"
+				+discountAmountHtml + countIntrAmtHtml);
+				
+		tr.find("input[id$='.billNo']").val(billNo);
+		var billNoHtml  = tr.find("input[id$='.billNo']").parent()[0].outerHTML;
+		var billIdHtml = tr.find("input[id$='.billId']").parent()[0].outerHTML;
+		var billNoLink = "<a href='#' onclick='showBillDiscMsg(this)'>" + billNo + "</a>";
+		tr.find("input[id$=_bill.billNo]").parent().parent().html(billNoLink + billIdHtml + billNoHtml);
+		
+//	  var billTypeHtml  = "<input id='"+pageCode+"_bill.billType' name='"+
+//	  pageCode+"_bill.billType' type='hidden' value='"+billType+"'/>";
+//	  tr.find("input[id$=_bill.billType]").parent().html(billType+billTypeHtml);
+		
+		var startDateHtml  = "<input id='"+pageCode+"_bill.startDate' name='"+
+		pageCode+"_bill.startDate' type='hidden' value='"+startDate+"'/>";
+		tr.find("input[id$=_bill.startDate]").parent().html(startDate+startDateHtml);
+		
+		var endDateHtml  = "<input id='"+pageCode+"_bill.endDate' name='"+
+		pageCode+"_bill.endDate' type='hidden' value='"+endDate+"'/>";
+		tr.find("input[id$=_bill.endDate]").parent().html(endDate+endDateHtml);
+		
+//	  var accBankNameHtml  = "<input id='"+pageCode+"_bill.accBankName' name='"+
+//	  pageCode+"_bill.accBankName' type='hidden' value='"+accBankName+"'/>";
+//	  tr.find("input[id$=_bill.accBankName]").parent().html(accBankName+accBankNameHtml);
+		
+		var payeeHtml  = "<input id='"+pageCode+"_bill.payee' name='"+
+		pageCode+"_bill.payee' type='hidden' value='"+payee+"'/>";
+		tr.find("input[id$=_bill.payee]").parent().html(payee+payeeHtml);
+		
+		var recAccountHtml  = "<input id='"+pageCode+"_bill.recAccount' name='"+
+		pageCode+"_bill.recAccount' type='hidden' value='"+recAccount+"'/>";
+		tr.find("input[id$=_bill.recAccount]").parent().html(recAccount + recAccountHtml);
+ 
+//	  var discountDateHtml  = "<input id='"+pageCode+"_bill.discountDate' name='"+
+//	  pageCode+"_bill.discountDate' type='hidden' value='"+discountDate+"'/>";
+//	  tr.find("input[id$=_bill.discountDate]").parent().html(discountDate + discountDateHtml);
+		
+		var dayNumHtml  = "<input id='"+pageCode+"_bill.dayNum' name='"+
+		pageCode+"_bill.dayNum' type='hidden' value='"+dayNum+"'/>";
+		tr.find("input[id$=_bill.dayNum]").parent().html(dayNum + dayNumHtml);
+		
+//	  var discountRateHtml  = "<input id='"+pageCode+"_bill.discountRate' name='"+
+//	  pageCode+"_bill.discountRate' type='hidden' value='"+discountRate+"'/>";
+//	  tr.find("input[id$=_bill.discountRate]").parent().html(FormatMoney(discountRate,6) + discountRateHtml);
+		countContractAmt();
+		setInfoEndDate();
+		countBillNum();
+	}
+}
+//录入 票据信息删除按钮
+function doDelBill(obj){
+	var list=$('div[id$="_bill"]');
+	var checks=list.find('input[id$="_check"]:checked');
+	if(checks==undefined || checks.length==0){
+		alert("至少选择一条数据");
+		return;
+	}
+	$(checks).each(function(){
+		nstc.sf.delCurrRow(this)
+	});
+}
+nstc.sf.delCurrRow = function(obj){
+	var table = nstc.sf.findParent(obj, "TABLE");
+	var tr = nstc.sf.findParent(obj, "TR");
+	if(tr){
+		if(arguments[1] === true){
+			nstc.sf.changeFlag(obj,'delete');
+			$(tr).hide();
+		}else{
+			table.deleteRow(tr.rowIndex);
+		}
+		//增加iframe自动刷新
+		try{
+			// 如果当前页面被iframe加载，自适应计算iframe的高度，跨域不适用。
+			if(window.parent!=window) {
+			var frameId = window.frameElement && window.frameElement.id || '';
+				window.parent.smartForm_iFrameHeight(frameId);
+			}
+		}catch(e){}
+	}
+	countContractAmt();
+	setInfoEndDate();
+	countBillNum();
+}
+function countBillNum(){
+	//校验票据信息
+	var page = $("input[id$='pageCode']").val();
+	var disAmtArray = $("input[id$='_bill.discountAmount']");
+	var bullNum = disAmtArray.length -1;
+	$("input[id$='_bill.billNum']").val(bullNum);
+	var billNumHtml  = $("input[id$='_bill.billNum']")[0].outerHTML;
+	$("input[id$=_bill.billNum]").closest("td").find("span")[0].innerHTML= "共" + bullNum + "张票据，票据总金额" + billNumHtml;
+	var conAmt = $("input[id$=_info.amount]").val();
+	$("input[id$='_bill.billSumAmount']").val(conAmt);
+	var billSumAmountHtml  = $("input[id$='_bill.billSumAmount']")[0].outerHTML;
+	var conAmtStr = conAmt == 0 ? '0.00' : FormatMoney(conAmt,2);
+	$("input[id$=_bill.billSumAmount]").closest("td").find("span")[1].innerHTML= conAmtStr + "元，票据贴现总金额" + billSumAmountHtml;
+	var disAmt = 0;
+	for(var i = 0; i < disAmtArray.length; i++){
+		disAmt += Number(disAmtArray[i].value.excludeNotNumericDot());
+	}
+	$("input[id$='_bill.discountSumAmt']").val(disAmt);
+	var billDisAmountHtml  = $("input[id$='_bill.discountSumAmt']")[0].outerHTML;
+	var disAmtStr = disAmt == 0 ? '0.00' : FormatMoney(disAmt,2);
+	$("input[id$=_bill.discountSumAmt]").closest("td").find("span")[2].innerHTML= disAmtStr + "元" + billDisAmountHtml;
+}
+//计算卖方付息金额
+function calSellIntrAmount(){
+	
+	if(checkSellIntrScale()){
+		//var conAmt = parseFloat($("input[id$=_info.amount]").val().excludeNotNumericDot());
+		var conAmt = $("input[id$=_info.amount]").val().excludeNotNumericDot();
+		var disAmtArray = $("input[id$='_bill.discountAmount']");
+		var disAmt = 0;
+		/*for(var i = 0; i < disAmtArray.length; i++){
+			disAmt += parseFloat(disAmtArray[i].value.excludeNotNumericDot());
+		}*/
+		var disAmt = parseFloat($("input[id$=_bill.discountSumAmt]").val().excludeNotNumericDot());
+		var sellIntrScale = $("input[id$=_info.sellIntrScale]").val();
+		var sellIntrAmount = 0;
+		if(conAmt!=null&&conAmt!=""&&sellIntrScale!=null&sellIntrScale!=""){
+			conAmt=parseFloat(conAmt);
+			sellIntrAmount= (conAmt-disAmt)*sellIntrScale/100;
+			$("input[id$='_info.sellIntrAmount']").val(sellIntrAmount);
+			var sellIntrAmountStr = sellIntrAmount == 0 ? '0.00' : FormatMoney(sellIntrAmount,2);
+			var outer= $("input[id$='_info.sellIntrAmount']")[0];
+			if(outer!=null&&outer!=''&&outer!=undefined){
+				var sellIntrAmountHtml  = $("input[id$='_info.sellIntrAmount']")[0].outerHTML;
+				$("input[id$=_info.sellIntrAmount]").closest("td").find("span")[1].innerHTML= sellIntrAmountStr + "元" + sellIntrAmountHtml;
+			}
+		}else{
+			$("input[id$='_info.sellIntrAmount']").val(sellIntrAmount);
+			var sellIntrAmountStr = sellIntrAmount == 0 ? '0.00' : FormatMoney(sellIntrAmount,2);
+			var outer= $("input[id$='_info.sellIntrAmount']")[0];
+			if(outer!=null&&outer!=''&&outer!=undefined){
+				var sellIntrAmountHtml  = $("input[id$='_info.sellIntrAmount']")[0].outerHTML;
+				if(sellIntrAmountHtml!=undefined){
+					$("input[id$=_info.sellIntrAmount]").closest("td").find("span")[1].innerHTML= sellIntrAmountStr + "元" + sellIntrAmountHtml;
+				}
+			}
+		}
+	}
+}
+function doSelBillDisc(){
+	var applyNo = $("input[id$=_info.cltNo]").val();
+	if(applyNo == undefined || applyNo == null || applyNo == ''){
+		alert("请先选择单位")
+		return ;
+	}
+	var billStyle = $("select[id$=_info.billStyle]").val();
+	var billIds = "";
+	$("input[id$=_bill.billId]").each(function (){
+		var temp = this.value;
+		if(temp != undefined && temp != null && temp != ''){
+			billIds = billIds+","+temp;
+		}
+	})
+	var url="GDEBIT@gdt_select_billDisc.sf?m=v&applyNo="　+　applyNo　+　"&billIds="　+　billIds + "&billStyle=" +　billStyle;
+	openwin(url, '选择票据页面', 1000,600);
+}
+
+//删除所有票据
+function deleteAllBill(){
+	var list = $('table[id$="_bill"][id^="gdt"]');
+	var checks = list.find('tbody tr:visible [id$=".billNo"]');
+	$(checks).each(function(){
+		nstc.sf.delCurrRow(this)
+	});
+}

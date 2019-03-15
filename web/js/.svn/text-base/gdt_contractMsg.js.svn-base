@@ -1,0 +1,106 @@
+$(function (){
+	
+	var recourse = $("input[id$='_info.isRecourse']").val();
+	if(recourse == "0"){
+		$("input[id$='recourse']").attr('checked', 'checked');
+	}
+	
+	var m = document.getElementById('m').value;
+	if(m!=null && m=='v'){
+		$("font").text("");
+		try {
+			$("[id$='_info.isDelegate']:checkbox").attr("disabled",true);
+		} catch (e) {}
+		
+		try {
+			$("[id$='_info.recourse']:checkbox").attr("disabled",true);			
+		} catch (e) {}
+		
+		//是否重大重要文本显示
+		var $isImportant = $("input[id$='_form.isImportant']");
+		$isImportant.closest("span").text($isImportant.val() == 0 ? "否" : "是");
+	}
+	//融资租赁初始化租赁金额宽度
+	if ($("input[id$='.leasePremium']").val() != undefined) {
+		$("input[id$='.leasePremiumRatio']").parent().attr('style','width:120px');
+		$("input[id$='.leasePremium']").parent().attr('style','width:120px');
+	}
+	var bussVariety = $("input[id$='_form.bussVariety']").val();
+	if(bussVariety == 'CLMS08'){
+		var delegateCltNo = $("input[id$='_info.delegateCltNo']").val();
+		var delegateCltName = $("input[id$='_info.delegateCltName']").val();
+		if(delegateCltNo == undefined || delegateCltNo == null ||delegateCltNo == ""){
+			//显示输入框,隐藏选框
+			$("input[id$='isDelegate']").attr('checked', false);
+			$("input[id$='delegateCltName_inner']").hide();
+			$("input[id$='delegateCltName_outer']").show();
+			$("input[id$='delegateCltName_outer']").val(delegateCltName);
+		}else{ 
+			$("input[id$='isDelegate']").attr('checked', 'checked');
+			$("input[id$='delegateCltName_outer']").hide();
+			$("input[id$='delegateCltName_inner']").show();
+			$("input[id$='delegateCltName_inner']").val(delegateCltName);
+		}
+	}
+	
+	var pageCode = $("input[id='pageCode']").val();
+	//******************************
+//	$("input[name='_unitCode'][value='"+pageCode+"_info']").parent("span").attr("style","right: -7px");
+//	$("input[name='_unitCode'][value='"+pageCode+"_way']").parent("span").attr("style","right: -7px");
+	
+	//**************************
+	//担保
+	$("input[id$='guaranteeType']").each(function() {
+		var tr = $(this).parents("tr").first();
+		var type = this.value;
+		if(type == 'G02' //质押担保
+			|| type == 'G03') {//抵押担保
+			tr.find("input[id$='useAmount']").parent().hide();
+		} else {
+			tr.find("input[id$='pledgeEval']").parent().hide();
+		}
+	});
+	
+	
+	//是否占授信
+	var isTakeCredit = $("input[id$='.isTakeCredit']").val();
+	$("input[id$='isTakeCredit_tmp']").each(function() {
+		if (this.value == isTakeCredit) {
+			$(this).find("span").click();
+			$(this).click();
+		}
+	});
+	
+	//是否占担保
+	var isTakeGuarantee = $("input[id$='.isTakeGuarantee']").val();
+	$("input[id$='isTakeGuarantee_tmp']").each(function() {
+		if (this.value == isTakeGuarantee) {
+			$(this).find("span").click();
+			$(this).click();
+		}
+	});
+	//按钮置灰（放在最后）
+	$("input[type='radio']").attr('disabled','disabled');
+})
+
+//展示信用证
+function showLCBillMsg(obj){
+	var tr = $(nstc.sf.findParent(obj,"TR"));
+	var wbId = tr.find("input[id$=.billId]").val();
+	var url = "BMMS@showILCDetail.sf?m=v&wbId=" + wbId;
+	openwin(url, '信用证详情', 800, 500);
+}
+//展示信用证
+function showDraftBillMsg(obj){
+	var tr = $(nstc.sf.findParent(obj,"TR"));
+	var wbId = tr.find("input[id$=.billId]").val();
+	var url = "BMMS@showDraftInfoDetail.sf?m=v&wbId=" + wbId;
+	openwin(url, '承兑汇票详情', 800, 500);
+}
+//展示单据
+function showSDBillMsg(obj){
+	var tr = $(nstc.sf.findParent(obj,"TR"));
+	var wbId = tr.find("input[id$=.billId]").val();
+	var url = "BMMS@showSDDetail.sf?m=v&wbId=" + wbId;
+	openwin(url, '单据详情', 800, 500);
+}

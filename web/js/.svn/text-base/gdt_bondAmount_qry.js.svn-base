@@ -1,0 +1,24 @@
+$(function(){
+
+});
+
+
+//查询操作
+function doQuery(obj){
+	var minEndDate = $('input[id$=.minDate]').val();
+	var maxEndDate = $('input[id$=.maxDate]').val();
+	if(!compareDate(minEndDate, maxEndDate, '注册额度到期日期间范围不合理')){
+		return;
+	} 
+	var minEndDateD = $('input[id$=.minDateD]').val();
+	var maxEndDateD = $('input[id$=.maxDateD]').val();
+	if(!compareDate(minEndDateD, maxEndDateD, '登记日期期间范围不合理')){
+		return;
+	} 
+	smartForm_doRefresh(obj)
+}
+
+function showBondissue(bondissueId){
+	var url = 'GDEBIT@gdt_bondlimit_register.sf?m=v&bondissueId=' + bondissueId;
+	openwin(url, '债券注册额度详情', 1200, 600);
+}

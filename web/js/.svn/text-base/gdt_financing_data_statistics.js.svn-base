@@ -1,0 +1,17 @@
+$(function() {
+	// 金额单位
+	var unit = $("select[id='gdt_financ_data_statistics_lt.moneyUnitOption']");
+	var moneyUnit = $("input[id='gdt_financ_data_statistics_qry.moneyUnit']").val();
+	if (moneyUnit != '') {
+		unit.attr('value', moneyUnit);
+	}
+
+});
+
+// 修改金额单位 刷新页面 改变金额值
+function setAmountByUnit(obj) {
+	var unit = obj.value;
+	$("input[id='gdt_financ_data_statistics_qry.moneyUnit']").val(unit);
+	var refreshObj = $("input[id='gdt_financ_data_statistics_qry.refresh']")[0];
+	smartForm_doRefresh(refreshObj);
+}
