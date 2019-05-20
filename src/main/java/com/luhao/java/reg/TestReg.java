@@ -57,4 +57,11 @@ public class TestReg {
         System.out.println(sb.toString());
     }
     
+    @Test
+    public void test3() {
+        String str = "你好,value2;n2a2me2,2v2a2l2u2e2;";
+        String reg = "^(\\S+,\\S+;)+$";
+        System.out.println(str.matches(reg));
+        
+    }
 }
