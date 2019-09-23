@@ -1,12 +1,10 @@
 package com.luhao.map;
 
+import com.luhao.model.Student;
+import org.junit.jupiter.api.Test;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.Test;
-
-import com.luhao.model.Student;
-
 /**
  * <p>Title: CloneMap.java</p>
  *
