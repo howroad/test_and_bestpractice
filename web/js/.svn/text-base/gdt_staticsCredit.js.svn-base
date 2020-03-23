@@ -1,7 +1,0 @@
-function showCredit(creditClass, dir, cltNo, bussVariety){
-	var currencyNo = $('select[id$=.currencyNo]').val();
-	var countDate = $('input[id$=.countDate]').val();
-	var url = 'GDEBIT@gdt_staticsCreditMsg.sf?cltNo='+cltNo+"&countDate="+countDate
-	+"&creditClass="+creditClass+"&bussVariety="+bussVariety+"&dir="+dir+"&currencyNo="+currencyNo;
-	openwin(url, '授信占用明细查询列表', 1200, 600);
-}

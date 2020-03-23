@@ -1,5 +1,6 @@
 package com.luhao.guava;
 
+import com.luhao.model.Student;
 import org.junit.Test;
 
 import com.google.common.base.Preconditions;
@@ -24,6 +25,7 @@ public class TestValidate {
         String str = null;
         run1(str);
     }
+
     @Test
     public void test2() {
         Student stu = null;
@@ -31,8 +33,10 @@ public class TestValidate {
         Student stu2 = new Student();
         run2(stu2);
     }
+
     /**
      * Preconditions 检查参数
+     *
      * @param str
      * @author luhao
      * @since：2019年2月28日 下午7:14:04
@@ -41,10 +45,10 @@ public class TestValidate {
         Preconditions.checkNotNull(str);
         System.out.println("运行！");
     }
+
     public void run2(Student stu) {
         Preconditions.checkNotNull(stu);
         System.out.println("运行！");
     }
 
 }
-class Student{}

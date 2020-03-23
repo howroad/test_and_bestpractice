@@ -1,0 +1,26 @@
+<html>
+<head>
+    <script language="javascript">
+        for (var i = 1; i <= 9; i++) {
+            checkXml("SPICII-" + i + ".xml");
+        }
+
+        function checkXml(path) {
+            // 创建xml文档解析器对象
+            var xmldoc = new ActiveXObject("Microsoft.XMLDOM");
+            // 开启xml校验
+            xmldoc.validateOnParse = "true";
+            // 装载xml文档，即指定校验哪个XML文件
+            xmldoc.load(path);
+            document.writeln(path + ":" + "<br>");
+            document.writeln("\t错误信息：" + xmldoc.parseError.reason + "<br>");
+            document.writeln("\t错误行号：" + xmldoc.parseError.line + "<br>");
+            document.writeln("<br />")
+        }
+    </script>
+
+</head>
+<body>
+
+</body>
+</html>

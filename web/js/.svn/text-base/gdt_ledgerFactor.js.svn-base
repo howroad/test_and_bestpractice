@@ -1,6 +1,0 @@
-$(function(){
-	var recourse = $("input[id$='_info.isRecourse']").val();
-	if(recourse == "0"){
-		$("input[id$='recourse']").attr('checked', 'checked');
-	}
-});

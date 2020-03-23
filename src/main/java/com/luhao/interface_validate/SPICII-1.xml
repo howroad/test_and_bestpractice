@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE rules SYSTEM "rules.dtd">
+<rules>
+    <remoteParams name="SPICII-1-1">
+        <remoteParam name="ACCOUNTNO" remark="账号" type="C32" require="1" reg="" fieldName="accountNo"/>
+        <remoteParam name="APPLYID" remark="账户申请流水号" type="N38" require="" reg="" fieldName="applyId"/>
+        <remoteParam name="CLTNO" remark="单位编号" type="C32" require="1" reg="" fieldName="cltNo"/>
+        <remoteParam name="CLT_NAME" remark="单位名称" type="C64" require="1" reg="" fieldName="cltName" />
+        <remoteParam name="ASSBANKNAME" remark="合作金融网点名称" type="C128" require="1" reg="" fieldName="assBankName" />
+        <remoteParam name="ISABROAD" remark="境内外" type="C1" require="" reg="0|1" fieldName="isAbroad" />
+        <remoteParam name="AREAID" remark="区域编码" type="N38" require="" reg="" fieldName="areaId" />
+        <remoteParam name="OPENACCOUNTDATE" remark="开户日期" type="D" require="1" reg="" fieldName="openAccountDate" />
+        <remoteParam name="ACCOUNTNAME" remark="户名" type="C128" require="1" reg="" fieldName="accountName" />
+        <remoteParam name="MEMORYNAME" remark="助记名" type="C128" require="" reg="" fieldName="memoryName" />
+        <remoteParam name="CURRENCYNO" remark="币种" type="C3" require="1" reg="" fieldName="currencyNo" />
+        <remoteParam name="CTNAME" remark="账户性质" type="C32" require="1" reg="" fieldName="type" />
+        <remoteParam name="NATURENAME" remark="账户用途" type="C32" require="1" reg="" fieldName="natureName" />
+        <remoteParam name="FOREIGNTYPE" remark="外汇业务类型" type="N1" require="" reg="1|2" fieldName="foreignType" />
+        <remoteParam name="ASSOCIATEFLAG" remark="联网方式" type="C1" require="1" reg="0|1|2" fieldName="associateFlag" />
+        <remoteParam name="ARRDESS" remark="单位/项目地址" type="C256" require="1" reg="" fieldName="arrdess" />
+        <remoteParam name="CNREMARK" remark="备注" type="C500" require="" reg="" fieldName="cnreMark" />
+        <remoteParam name="ACNTSTATE" remark="账户状态" type="N2" require="1" reg="0|1|-1|-2" fieldName="acntState" />
+        <remoteParam name="EACCOUNT" remark="实体账户账号" type="C32" require="" reg="" fieldName="eAccount" />
+        <remoteParam name="PUBLIC_TELEPHONE" remark="对公电话" type="C20" require="" reg="" fieldName="publicTelephone" />
+        <remoteParam name="CUSTOMER_MANAGER" remark="客户经理" type="C60" require="" reg="" fieldName="customerManager" />
+        <remoteParam name="CM_TELEPHONE" remark="客户经理电话" type="C20" require="" reg="" fieldName="cmTelephone" />
+        <remoteParam name="CM_MAIL" remark="客户经理邮箱" type="C60" require="" reg="" fieldName="cmMail" />
+        <remoteParam name="IS_DEDUCT" remark="是否扣减账户：0不是；1是" type="N1" require="" reg="0|1" fieldName="isDeduct" />
+        <remoteParam name="IS_ESCROWACCOUNT" remark="是否监管账户(0-否 1-是)" type="N1" require="" reg="0|1" fieldName="isEscrowAccount" />
+        <remoteParam name="NEED_ONLINE" remark="是否申请上线" type="N1" require="" reg="0|1" fieldName="needOnline" />
+        <remoteParam name="CONTACT_PERSON" remark="联系人" type="C32" require="1" reg="" fieldName="contactPerson" />
+        <remoteParam name="CONTACT_TEL" remark="联系人电话" type="C32" require="1" reg="" fieldName="contactTel" />
+        <remoteParam name="BASIC_ACCOUNT_NO" remark="基本户账户" type="C32" require="" reg="" fieldName="basicAccountNo" />
+        <remoteParam name="BASIC_ACCOUNT_BANKNAME" remark="基本户开户行" type="C64" require="" reg="" fieldName="basicAccountBankname" />
+        <remoteParam name="AUTHORIZED_PERSON_NAME" remark="被授权人姓名" type="C32" require="1" reg="" fieldName="authorizedPersonName" />
+        <remoteParam name="AUTHORIZED_PERSON_ID" remark="被授权人身份证号" type="C32" require="1" reg="" fieldName="authorizedPersonId" />
+        <remoteParam name="LEGAL_PERSON" remark="法人姓名" type="C32" require="" reg="" fieldName="legalPerson" />
+        <remoteParam name="LEGAL_ID_CARD" remark="法人身份证号" type="C32" require="" reg="" fieldName="legalIdCard" />
+        <remoteParam name="NAMES_SEAL" remark="印鉴人名章名称" type="C100" require="" reg="" fieldName="namesSeal" />
+        <remoteParam name="FINANCIAL_SEAL" remark="印鉴财务章名称" type="C128" require="" reg="" fieldName="financialSeal" />
+        <remoteParam name="OFFICIAL_SEAL" remark="公章名称" type="C128" require="" reg="" fieldName="officialSeal" />
+        <remoteParam name="ADMIN_AREA" remark="行政区划" type="C32" require="" reg="" fieldName="adminArea" />
+        <remoteParam name="ACTUAL_OFFICE_ADDRESS" remark="实际办公地址" type="C100" require="1" reg="" fieldName="actualOfficeAddress" />
+        <remoteParam name="IS_SEAL_LEGAL_PERSON" remark="预留印鉴是否为法人" type="N1" require="1" reg="0|1" fieldName="isSealLegalPerson" />
+        <remoteParam name="BELONG_FTA" remark="是否属于自贸区" type="N1" require="1" reg="0|1" fieldName="belongFta" />
+        <remoteParam name="IS_OPEN_REMIND" remark="是否开通提醒" type="N1" require="1" reg="0|1" fieldName="isOpenRemind" />
+        <remoteParam name="SMS_REMIND" remark="是否短信提醒" type="N1" require="1" reg="0|1" fieldName="smsRemind" />
+        <remoteParam name="TEL_REMIND" remark="是否电话提醒" type="N1" require="1" reg="0|1" fieldName="telRemind" />
+        <remoteParam name="LARGE_AMOUNT_REMIND" remark="是否大额提醒" type="N1" require="" reg="0|1" fieldName="largeAmountRemind" />
+        <remoteParam name="DUE_DATE" remark="账户到期日" type="D" require="" reg="" fieldName="dueDate" />
+    </remoteParams>
+
+    <remoteParams name="SPICII-1-2">
+        <remoteParam name="ACCOUNTNO" remark="账号" type="C32" require="1" reg="" fieldName="accountNo" />
+        <remoteParam name="CHANGE_REASON" remark="变更原因" type="C128" require="1" reg="" fieldName="changeReason" />
+        <remoteParam name="CHANGE_DATE" remark="变更日期" type="D" require="1" reg="" fieldName="changeDate" />
+        <remoteParam name="CHANGE_APPLY_ID" remark="变更申请ID" type="N38" require="1" reg="" fieldName="changeApplyId" />
+        <remoteParam name="CLTNO" remark="单位编号" type="C32" require="" reg="" fieldName="cltNo" />
+        <remoteParam name="CLT_NAME" remark="单位名称" type="C64" require="" reg="" fieldName="cltName" />
+        <remoteParam name="ASSBANKNAME" remark="合作金融网点名称" type="C128" require="" reg="" fieldName="assBankName" />
+        <remoteParam name="ISABROAD" remark="境内外" type="C1" require="" reg="0|1" fieldName="isAbroad" />
+        <remoteParam name="AREAID" remark="区域编码" type="N38" require="" reg="" fieldName="areaId" />
+        <remoteParam name="OPENACCOUNTDATE" remark="开户日期" type="D" require="" reg="" fieldName="openAccountDate" />
+        <remoteParam name="ACCOUNTNAME" remark="户名" type="C128" require="" reg="" fieldName="accountName" />
+        <remoteParam name="MEMORYNAME" remark="助记名" type="C128" require="" reg="" fieldName="memoryName" />
+        <remoteParam name="CURRENCYNO" remark="币种" type="C3" require="" reg="" fieldName="currencyNo" />
+        <remoteParam name="CTNAME" remark="账户性质" type="C32" require="" reg="" fieldName="type" />
+        <remoteParam name="NATURENAME" remark="账户用途" type="C32" require="" reg="" fieldName="natureName" />
+        <remoteParam name="FOREIGNTYPE" remark="外汇业务类型" type="N38" require="" reg="1|2" fieldName="foreignType" />
+        <remoteParam name="ASSOCIATEFLAG" remark="联网方式" type="C1" require="" reg="0|1|2" fieldName="associateFlag" />
+        <remoteParam name="ARRDESS" remark="单位/项目地址" type="C256" require="" reg="" fieldName="arrdess" />
+        <remoteParam name="CNREMARK" remark="备注" type="C500" require="" reg="" fieldName="cnreMark" />
+        <remoteParam name="ACNTSTATE" remark="账户状态" type="N38" require="" reg="0|1|-1|-2" fieldName="acntState" />
+        <remoteParam name="EACCOUNT" remark="实体账户账号" type="C32" require="" reg="" fieldName="eAccount" />
+        <remoteParam name="PUBLIC_TELEPHONE" remark="对公电话" type="C20" require="" reg="" fieldName="publicTelephone" />
+        <remoteParam name="CUSTOMER_MANAGER" remark="客户经理" type="C60" require="" reg="" fieldName="customerManager" />
+        <remoteParam name="CM_TELEPHONE" remark="客户经理电话" type="C20" require="" reg="" fieldName="cmTelephone" />
+        <remoteParam name="CM_MAIL" remark="客户经理邮箱" type="C60" require="" reg="" fieldName="cmMail" />
+        <remoteParam name="IS_DEDUCT" remark="是否扣减账户：0不是；1是" type="N38" require="" reg="0|1" fieldName="isDeduct" />
+        <remoteParam name="IS_ESCROWACCOUNT" remark="是否监管账户(0-否 1-是)" type="N38" require="" reg="0|1" fieldName="isEscrowAccount" />
+        <remoteParam name="NEED_ONLINE" remark="是否申请上线" type="N38" require="" reg="0|1" fieldName="needOnline" />
+        <remoteParam name="CONTACT_PERSON" remark="联系人" type="C32" require="" reg="" fieldName="contactPerson" />
+        <remoteParam name="CONTACT_TEL" remark="联系人电话" type="C32" require="" reg="" fieldName="contactTel" />
+        <remoteParam name="BASIC_ACCOUNT_NO" remark="基本户账户" type="C32" require="" reg="" fieldName="basicAccountNo" />
+        <remoteParam name="BASIC_ACCOUNT_BANKNAME" remark="基本户开户行" type="C64" require="" reg="" fieldName="basicAccountBankname" />
+        <remoteParam name="AUTHORIZED_PERSON_NAME" remark="被授权人姓名" type="C32" require="" reg="" fieldName="authorizedPersonName" />
+        <remoteParam name="AUTHORIZED_PERSON_ID" remark="被授权人身份证号" type="C32" require="" reg="" fieldName="authorizedPersonId" />
+        <remoteParam name="LEGAL_PERSON" remark="法人姓名" type="C32" require="" reg="" fieldName="legalPerson" />
+        <remoteParam name="LEGAL_ID_CARD" remark="法人身份证号" type="C32" require="" reg="" fieldName="legalIdCard" />
+        <remoteParam name="NAMES_SEAL" remark="印鉴人名章名称" type="C100" require="" reg="" fieldName="namesSeal" />
+        <remoteParam name="FINANCIAL_SEAL" remark="印鉴财务章名称" type="C128" require="" reg="" fieldName="financialSeal" />
+        <remoteParam name="OFFICIAL_SEAL" remark="公章名称" type="C128" require="" reg="" fieldName="officialSeal" />
+        <remoteParam name="ADMIN_AREA" remark="行政区划" type="C32" require="" reg="" fieldName="adminArea" />
+        <remoteParam name="ACTUAL_OFFICE_ADDRESS" remark="实际办公地址" type="C100" require="" reg="" fieldName="actualOfficeAddress" />
+        <remoteParam name="IS_SEAL_LEGAL_PERSON" remark="预留印鉴是否为法人" type="N38" require="" reg="0|1" fieldName="isSealLegalPerson" />
+        <remoteParam name="BELONG_FTA" remark="是否属于自贸区" type="N38" require="" reg="0|1" fieldName="belongFta" />
+        <remoteParam name="IS_OPEN_REMIND" remark="是否开通提醒" type="N38" require="" reg="0|1" fieldName="isOpenRemind" />
+        <remoteParam name="SMS_REMIND" remark="是否短信提醒" type="N38" require="" reg="0|1" fieldName="smsRemind" />
+        <remoteParam name="TEL_REMIND" remark="是否电话提醒" type="N38" require="" reg="0|1" fieldName="telRemind" />
+        <remoteParam name="LARGE_AMOUNT_REMIND" remark="是否大额提醒" type="N38" require="" reg="0|1" fieldName="largeAmountRemind" />
+        <remoteParam name="DUE_DATE" remark="账户到期日" type="D" require="" reg="" fieldName="dueDate" />
+    </remoteParams>
+
+    <remoteParams name="SPICII-1-3">
+        <remoteParam name="ACCOUNTNO" remark="账号" type="C32" require="1" reg="" fieldName="accountNo" />
+        <remoteParam name="APPLYID" remark="销户申请流水号" type="N38" require="1" reg="" fieldName="applyId" />
+        <remoteParam name="CANCELDATE" remark="销户日期" type="D" require="1" reg="" fieldName="cancelDate" />
+        <remoteParam name="CANCELREMARK" remark="销户备注" type="C500" require="" reg="" fieldName="cancelRemark" />
+        <remoteParam name="CANCELREASON" remark="销户原因" type="C500" require="" reg="" fieldName="cancelReason" />
+    </remoteParams>
+
+    <remoteParams name="SPICII-1-4">
+        <remoteParam name="ACCOUNTNO" remark="账号" type="C32" require="1" reg="" fieldName="accountNo" />
+        <remoteParam name="CLTNO" remark="单位编号" type="C32" require="" reg="" fieldName="cltNo" />
+        <remoteParam name="CLT_NAME" remark="单位名称" type="C64" require="" reg="" fieldName="cltName" />
+        <remoteParam name="ASSBANKNAME" remark="合作金融网点名称" type="C128" require="" reg="" fieldName="assBankName" />
+        <remoteParam name="ISABROAD" remark="境内外" type="C1" require="" reg="0|1" fieldName="isAbroad" />
+        <remoteParam name="AREAID" remark="区域编码" type="N38" require="" reg="" fieldName="areaId" />
+        <remoteParam name="OPENACCOUNTDATE" remark="开户日期" type="D" require="" reg="" fieldName="openAccountDate" />
+        <remoteParam name="ACCOUNTNAME" remark="户名" type="C128" require="" reg="" fieldName="accountName" />
+        <remoteParam name="MEMORYNAME" remark="助记名" type="C128" require="" reg="" fieldName="memoryName" />
+        <remoteParam name="CURRENCYNO" remark="币种" type="C3" require="" reg="" fieldName="currencyNo" />
+        <remoteParam name="CTNAME" remark="账户性质" type="C32" require="" reg="" fieldName="type" />
+        <remoteParam name="NATURENAME" remark="账户用途" type="C32" require="" reg="" fieldName="natureName" />
+        <remoteParam name="FOREIGNTYPE" remark="外汇业务类型" type="N38" require="" reg="1|2" fieldName="foreignType" />
+        <remoteParam name="ASSOCIATEFLAG" remark="联网方式" type="C1" require="" reg="0|1|2" fieldName="associateFlag" />
+        <remoteParam name="ARRDESS" remark="单位/项目地址" type="C256" require="" reg="" fieldName="arrdess" />
+        <remoteParam name="CNREMARK" remark="备注" type="C500" require="" reg="" fieldName="cnreMark" />
+        <remoteParam name="ACNTSTATE" remark="账户状态" type="N38" require="" reg="0|1|-1|-2" fieldName="acntState" />
+        <remoteParam name="EACCOUNT" remark="实体账户账号" type="C32" require="" reg="" fieldName="eAccount" />
+        <remoteParam name="PUBLIC_TELEPHONE" remark="对公电话" type="C20" require="" reg="" fieldName="publicTelephone" />
+        <remoteParam name="CUSTOMER_MANAGER" remark="客户经理" type="C60" require="" reg="" fieldName="customerManager" />
+        <remoteParam name="CM_TELEPHONE" remark="客户经理电话" type="C20" require="" reg="" fieldName="cmTelephone" />
+        <remoteParam name="CM_MAIL" remark="客户经理邮箱" type="C60" require="" reg="" fieldName="cmMail" />
+        <remoteParam name="IS_DEDUCT" remark="是否扣减账户：0不是；1是" type="N38" require="" reg="0|1" fieldName="isDeduct" />
+        <remoteParam name="IS_ESCROWACCOUNT" remark="是否监管账户(0-否 1-是)" type="N38" require="" reg="0|1" fieldName="isEscrowAccount" />
+        <remoteParam name="NEED_ONLINE" remark="是否申请上线" type="N38" require="" reg="0|1" fieldName="needOnline" />
+        <remoteParam name="CONTACT_PERSON" remark="联系人" type="C32" require="" reg="" fieldName="contactPerson" />
+        <remoteParam name="CONTACT_TEL" remark="联系人电话" type="C32" require="" reg="" fieldName="contactTel" />
+        <remoteParam name="BASIC_ACCOUNT_NO" remark="基本户账户" type="C32" require="" reg="" fieldName="basicAccountNo" />
+        <remoteParam name="BASIC_ACCOUNT_BANKNAME" remark="基本户开户行" type="C64" require="" reg="" fieldName="basicAccountBankname" />
+        <remoteParam name="AUTHORIZED_PERSON_NAME" remark="被授权人姓名" type="C32" require="" reg="" fieldName="authorizedPersonName" />
+        <remoteParam name="AUTHORIZED_PERSON_ID" remark="被授权人身份证号" type="C32" require="" reg="" fieldName="authorizedPersonId" />
+        <remoteParam name="LEGAL_PERSON" remark="法人姓名" type="C32" require="" reg="" fieldName="legalPerson" />
+        <remoteParam name="LEGAL_ID_CARD" remark="法人身份证号" type="C32" require="" reg="" fieldName="legalIdCard" />
+        <remoteParam name="NAMES_SEAL" remark="印鉴人名章名称" type="C100" require="" reg="" fieldName="namesSeal" />
+        <remoteParam name="FINANCIAL_SEAL" remark="印鉴财务章名称" type="C128" require="" reg="" fieldName="financialSeal" />
+        <remoteParam name="OFFICIAL_SEAL" remark="公章名称" type="C128" require="" reg="" fieldName="officialSeal" />
+        <remoteParam name="ADMIN_AREA" remark="行政区划" type="C32" require="" reg="" fieldName="adminArea" />
+        <remoteParam name="ACTUAL_OFFICE_ADDRESS" remark="实际办公地址" type="C100" require="" reg="" fieldName="actualOfficeAddress" />
+        <remoteParam name="IS_SEAL_LEGAL_PERSON" remark="预留印鉴是否为法人" type="N38" require="" reg="0|1" fieldName="isSealLegalPerson" />
+        <remoteParam name="BELONG_FTA" remark="是否属于自贸区" type="N38" require="" reg="0|1" fieldName="belongFta" />
+        <remoteParam name="IS_OPEN_REMIND" remark="是否开通提醒" type="N38" require="" reg="0|1" fieldName="isOpenRemind" />
+        <remoteParam name="SMS_REMIND" remark="是否短信提醒" type="N38" require="" reg="0|1" fieldName="smsRemind" />
+        <remoteParam name="TEL_REMIND" remark="是否电话提醒" type="N38" require="" reg="0|1" fieldName="telRemind" />
+        <remoteParam name="LARGE_AMOUNT_REMIND" remark="是否大额提醒" type="N38" require="" reg="0|1" fieldName="largeAmountRemind" />
+        <remoteParam name="DUE_DATE" remark="账户到期日" type="D" require="" reg="" fieldName="dueDate" />
+    </remoteParams>
+</rules>

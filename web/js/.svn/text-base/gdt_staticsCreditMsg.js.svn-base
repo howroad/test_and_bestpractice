@@ -1,5 +1,0 @@
-//查看授信合同
-function showCredit(contractId){
-	var url = 'CLMS-Web@clms_creditContractEntry.sf?m=v&contractId=' + contractId;
-	openwin(url, '授信合同详情', 900, 600);
-}

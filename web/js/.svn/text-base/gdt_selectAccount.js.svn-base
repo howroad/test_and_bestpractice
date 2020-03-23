@@ -1,9 +1,0 @@
-function selAccount(accountNo,accountName, bankName){
-	var result = {};
-	result.accountNo = accountNo;
-	result.accountName = accountName;
-	result.bankName = bankName;
-	top.Layer.getWin().setAccount(result);
-	windowClose();
-	
-}

@@ -40,6 +40,10 @@ public class Student {
     public void setStudentTeacher(Teacher studentTeacher) {
         this.studentTeacher = studentTeacher;
     }
+
+    public Student() {
+    }
+
     public Student(String studentName, Integer studentAge, Double studentAmount, Teacher studentTeacher) {
         super();
         this.studentName = studentName;

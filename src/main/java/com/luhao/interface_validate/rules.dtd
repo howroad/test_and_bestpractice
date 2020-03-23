@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!ELEMENT rules (remoteParams+)>
+<!ELEMENT remoteParams (remoteParam+)>
+<!ELEMENT remoteParam EMPTY>
+<!ATTLIST remoteParams
+        name ID #REQUIRED
+        >
+<!ATTLIST remoteParam
+        name CDATA #REQUIRED
+        remark CDATA #REQUIRED
+        type CDATA #REQUIRED
+        require CDATA #REQUIRED
+        reg CDATA #IMPLIED
+        fieldName CDATA #IMPLIED
+        >
