@@ -15,4 +15,8 @@ package com.luhao.enumText;
 public enum EnumText{
     GET,
     POST;
+
+    public static void main(String[] args) {
+        System.out.println(GET);//GET
+    }
 }
