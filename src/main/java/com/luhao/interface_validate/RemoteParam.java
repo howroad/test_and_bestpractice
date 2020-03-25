@@ -8,8 +8,8 @@ import org.xml.sax.Attributes;
 
 /**
  * <p>Title: RemoteParam.java</p>
- * <p>Description: ½Ó¿Ú²ÎÊı</p>
- * <p>Company: ±±¾©¾ÅºãĞÇ¿Æ¼¼¹É·İÓĞÏŞ¹«Ë¾</p>
+ * <p>Description: æ¥å£å‚æ•°</p>
+ * <p>Company: åŒ—äº¬ä¹æ’æ˜Ÿç§‘æŠ€è‚¡ä»½æœ‰é™å…¬å¸</p>
  *
  * @author luhao
  * @since 2020-03-14 11:13
@@ -18,11 +18,11 @@ public class RemoteParam {
     private String name;
     private String remark;
     private Integer length;
-    //Ğ¡ÊıÎ»Êı
+    //å°æ•°ä½æ•°
     private Integer decimalDigits;
-    //ÀàĞÍ NUMBER/NUMBER(X,X)/INTEGER/VARCHAR2(XX)/DATE
+    //ç±»å‹ NUMBER/NUMBER(X,X)/INTEGER/VARCHAR2(XX)/DATE
     private String type;
-    //±ØÌî
+    //å¿…å¡«
     private Integer require;
     private String reg;
     private String fieldName;
@@ -72,33 +72,33 @@ public class RemoteParam {
 
     public void validate(Object obj, String sign) {
         if (obj == null) {
-            Validate.isTrue(!YES.equals(require), notice(sign) + "²»ÄÜÎª¿Õ£¡");
+            Validate.isTrue(!YES.equals(require), notice(sign) + "ä¸èƒ½ä¸ºç©ºï¼");
         }
         String value = (String) obj;
         if (StringUtils.isBlank(value)) {
-            Validate.isTrue(!YES.equals(require), notice(sign)  + "²»ÄÜÎª¿Õ£¡");
+            Validate.isTrue(!YES.equals(require), notice(sign)  + "ä¸èƒ½ä¸ºç©ºï¼");
         } else {
             if (type.startsWith("C")) {
-                Validate.isTrue(value.length() <= length, notice(sign)  + "³¤¶È²»¿É´óÓÚ" + length + ":" + obj);
+                Validate.isTrue(value.length() <= length, notice(sign)  + "é•¿åº¦ä¸å¯å¤§äº" + length + ":" + obj);
             } else if ("N".equals(type) && decimalDigits == null) {
-                Validate.isTrue(value.matches(INTEGER_REG), notice(sign)  + "²»Âú×ãÕûÊı¹æÔò£¡" + ":" + obj);
-                Validate.isTrue(value.length() <= length, notice(sign)  + "³¤¶È²»¿É´óÓÚ" + length + ":" + obj);
+                Validate.isTrue(value.matches(INTEGER_REG), notice(sign)  + "ä¸æ»¡è¶³æ•´æ•°è§„åˆ™ï¼" + ":" + obj);
+                Validate.isTrue(value.length() <= length, notice(sign)  + "é•¿åº¦ä¸å¯å¤§äº" + length + ":" + obj);
 
             } else if (decimalDigits != null) {
-                Validate.isTrue(value.matches(getDoubleReg()), notice(sign)  + "±ØĞëÎª¸¡µãÊıÀàĞÍ£¬ÇÒÕûÊıÎ»²»¿É³¬¹ı" + length + "£¬Ğ¡ÊıÎ»²»¿É³¬¹ı" + decimalDigits + ":" + obj);
+                Validate.isTrue(value.matches(getDoubleReg()), notice(sign)  + "å¿…é¡»ä¸ºæµ®ç‚¹æ•°ç±»å‹ï¼Œä¸”æ•´æ•°ä½ä¸å¯è¶…è¿‡" + length + "ï¼Œå°æ•°ä½ä¸å¯è¶…è¿‡" + decimalDigits + ":" + obj);
             } else if ("D".equals(type)) {
-                Validate.isTrue(value.matches(DATE_REG), notice(sign) + "²»·ûºÏÈÕÆÚ¸ñÊ½!" + ":" + obj);
+                Validate.isTrue(value.matches(DATE_REG), notice(sign) + "ä¸ç¬¦åˆæ—¥æœŸæ ¼å¼!" + ":" + obj);
             }
             if (StringUtils.isNotBlank(reg)) {
-                Validate.isTrue(value.matches(reg), notice(sign)  + "²ÎÊıÖµ²»ºÏ·¨£¡" + ":" + obj);
+                Validate.isTrue(value.matches(reg), notice(sign)  + "å‚æ•°å€¼ä¸åˆæ³•ï¼" + ":" + obj);
             }
         }
 
     }
 
     /**
-     * ÌáÊ¾ĞÅÏ¢
-     * @param sign ±ê¼Ç´íÎóµÄÎ´Öª
+     * æç¤ºä¿¡æ¯
+     * @param sign æ ‡è®°é”™è¯¯çš„æœªçŸ¥
      * @return
      */
     private String notice(String sign){

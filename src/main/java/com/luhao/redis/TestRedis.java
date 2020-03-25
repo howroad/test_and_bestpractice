@@ -1,5 +1,7 @@
 package com.luhao.redis;
 
+import redis.clients.jedis.Jedis;
+
 /**
  * <p>Title: TestRedis.java</p>
  * <p>Description: </p>
@@ -40,4 +42,11 @@ public class TestRedis {
      * INCRBYFLOAR KEY increment 将key所在的数字+increment注意浮点数有精度问题 且该方法没有DECRBYFLOAT
      *
      * */
+
+    public static void main(String[] args) {
+        Jedis jedis = new Jedis("127.0.0.1");
+        String ping = jedis.ping();
+        String result = jedis.set("luhao", "niubi!");
+        System.out.println(result);
+    }
 }

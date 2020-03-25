@@ -19,8 +19,8 @@ import java.util.Map;
 
 /**
  * <p>Title: RemoteParamValidator.java</p>
- * <p>Description: ½Ó¿Ú²ÎÊıĞ£ÑéÆ÷</p>
- * <p>Company: ±±¾©¾ÅºãĞÇ¿Æ¼¼¹É·İÓĞÏŞ¹«Ë¾</p>
+ * <p>Description: æ¥å£å‚æ•°æ ¡éªŒå™¨</p>
+ * <p>Company: åŒ—äº¬ä¹æ’æ˜Ÿç§‘æŠ€è‚¡ä»½æœ‰é™å…¬å¸</p>
  *
  * @author luhao
  * @since 2020-03-14 11:16
@@ -44,19 +44,19 @@ public class RemoteParamValidator extends DefaultHandler {
     }
 
     /**
-     * ¹¹½¨±£´æÄ£ĞÍ
+     * æ„å»ºä¿å­˜æ¨¡å‹
      *
      * @param map
      * @param interfaceCode
      * @return
      */
     public Object buildModel(Map<String, Object> map, Class clazz, String interfaceCode) {
-        Validate.notNull(map, "²ÎÊıÁĞ±íÎª¿Õ£¡");
+        Validate.notNull(map, "å‚æ•°åˆ—è¡¨ä¸ºç©ºï¼");
         List<RemoteParam> remoteParams = remoteParamsMap.get(interfaceCode);
         if (remoteParams == null) {
             init();
         }
-        Validate.notNull(remoteParams, "³õÊ¼»¯Ğ£ÑéÆ÷Ê§°Ü£¡½Ó¿Ú£º" + interfaceCode);
+        Validate.notNull(remoteParams, "åˆå§‹åŒ–æ ¡éªŒå™¨å¤±è´¥ï¼æ¥å£ï¼š" + interfaceCode);
         Object model = null;
         try {
             model = clazz.newInstance();
@@ -89,16 +89,16 @@ public class RemoteParamValidator extends DefaultHandler {
     }
 
     /**
-     * Ğ£ÑéMapÀàĞÍµÄ²ÎÊı
+     * æ ¡éªŒMapç±»å‹çš„å‚æ•°
      *
      * @param interfaceKey
      * @param map
      * @param sign
      */
     public void validate(String interfaceKey, Map<String, Object> map, String sign) {
-        Validate.notEmpty(map, "²ÎÊıÁĞ±í²»¿ÉÎª¿Õ£¡");
+        Validate.notEmpty(map, "å‚æ•°åˆ—è¡¨ä¸å¯ä¸ºç©ºï¼");
         List<RemoteParam> rules = rules(interfaceKey);
-        Validate.notNull(rules, "ÎŞ·¨ÕÒµ½½Ó¿Ú" + interfaceKey);
+        Validate.notNull(rules, "æ— æ³•æ‰¾åˆ°æ¥å£" + interfaceKey);
         if (map.containsKey("DATA_LIST")) {
             List<Map<String, Object>> list = (List) (map.get("DATA_LIST"));
             validate(interfaceKey, list);
@@ -111,16 +111,16 @@ public class RemoteParamValidator extends DefaultHandler {
     }
 
     /**
-     * Ğ£ÑéListÀàĞÍµÄ²ÎÊı
+     * æ ¡éªŒListç±»å‹çš„å‚æ•°
      *
      * @param intefaceKey
      * @param list
      */
     public void validate(String intefaceKey, List<Map<String, Object>> list) {
-        Validate.noNullElements(list, "²ÎÊıÁĞ±í²»¿ÉÎª¿Õ£¡");
+        Validate.noNullElements(list, "å‚æ•°åˆ—è¡¨ä¸å¯ä¸ºç©ºï¼");
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> map = list.get(i);
-            validate(intefaceKey, map, "µÚ" + (i + 1) + "ĞĞ");
+            validate(intefaceKey, map, "ç¬¬" + (i + 1) + "è¡Œ");
         }
     }
 
@@ -130,17 +130,17 @@ public class RemoteParamValidator extends DefaultHandler {
             init();
         }
         rules = remoteParamsMap.get(interfaceKey);
-        Validate.notNull(rules, "Î´¶¨ÒåµÄ½Ó¿Ú£º" + interfaceKey);
+        Validate.notNull(rules, "æœªå®šä¹‰çš„æ¥å£ï¼š" + interfaceKey);
         return rules;
     }
 
     /**
-     * ³õÊ¼»¯
+     * åˆå§‹åŒ–
      */
     public void init() {
-        //1.»ñÈ¡SAXParserFactoryÊµÀı
+        //1.è·å–SAXParserFactoryå®ä¾‹
         SAXParserFactory factory = SAXParserFactory.newInstance();
-        //2.»ñÈ¡SAXparserÊµÀı
+        //2.è·å–SAXparserå®ä¾‹
         SAXParser saxParser = null;
         try {
             saxParser = factory.newSAXParser();
