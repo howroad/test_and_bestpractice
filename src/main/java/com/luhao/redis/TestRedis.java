@@ -1,5 +1,8 @@
 package com.luhao.redis;
 
+import com.luhao.model.Student;
+import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -49,4 +52,16 @@ public class TestRedis {
         String result = jedis.set("luhao", "niubi!");
         System.out.println(result);
     }
+
+    @Test
+    public void testRedisServer() throws Exception {
+        ClassPathXmlApplicationContext contect = new ClassPathXmlApplicationContext("classpath:spring-redis.xml");
+        RedisService redisService = (RedisService) contect.getBean("redisService");
+        Student student = new Student();
+        student.setStudentName("路昊");
+        System.out.println(redisService.set("shuaige3",student));
+        Student shuaige2 = (Student) redisService.get("shuaige3");
+        System.out.println(shuaige2);
+    }
+
 }

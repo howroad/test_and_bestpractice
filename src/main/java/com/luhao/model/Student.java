@@ -1,4 +1,7 @@
 package com.luhao.model;
+
+import java.io.Serializable;
+
 /**
  * <p>Title: Student.java</p>
  *
@@ -11,7 +14,7 @@ package com.luhao.model;
  * @since：2019年5月9日 下午3:14:38
  * 
  */
-public class Student {
+public class Student implements Serializable {
     private String studentName;
     private Integer studentAge;
     private Double studentAmount;
