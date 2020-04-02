@@ -85,4 +85,25 @@ public class TestFindAndReplace {
         System.out.println("Result=" + sb.toString());
     }
 
+
+    private static void test3(){
+        //零宽断言
+        //(?=X)
+        //
+        //肯定式向前查看，X代表查看的表达式
+        //
+        //(?!X)
+        //
+        //否定式向前查看，X代表查看的表达式
+        //
+        //(?<=X)
+        //
+        //肯定式向后查看，X代表查看的表达式
+        //
+        //(?<!X)
+        //
+        //否定式向后查看，X代表查看的表达式
+
+        Pattern p = Pattern.compile("Windows(?=NT|2000|2003)");
+    }
 }
