@@ -47,8 +47,19 @@ public class TestRedis {
      * */
 
     public static void main(String[] args) {
-        Jedis jedis = new Jedis("127.0.0.1");
+        /*
+        String url = "127.0.0.1";
+        testLocalhost(url);
+         */
+
+        String url = "121.36.168.192";
+        testLocalhost(url);
+    }
+
+    public static void testLocalhost(String url) {
+        Jedis jedis = new Jedis();
         String ping = jedis.ping();
+        System.out.println(ping);
         String result = jedis.set("luhao", "niubi!");
         System.out.println(result);
     }
