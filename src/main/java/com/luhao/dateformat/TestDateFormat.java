@@ -1,6 +1,8 @@
 package com.luhao.dateformat;
 
+import com.nstc.util.DateUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import sun.util.resources.LocaleData;
 
 import java.text.SimpleDateFormat;
@@ -19,6 +21,10 @@ import java.util.Date;
  */
 public class TestDateFormat {
     public static void main(String[] args) {
+        test2();
+    }
+
+    public static void test1(){
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(sdf.format(date)); //1
@@ -33,5 +39,9 @@ public class TestDateFormat {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));//3.5
 
         System.out.println(DateFormatUtils.format(date,"yyyy-MM-dd HH:mm:ss"));//4
+    }
+
+    public static void test2(){
+        System.out.println(DateUtil.getDate());
     }
 }

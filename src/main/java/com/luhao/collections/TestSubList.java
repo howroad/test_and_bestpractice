@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class TestSubList {
     public static void main(String[] args) {
+        int i = 0;
+        System.out.println(i += 30);
         test1();
     }
 
@@ -24,8 +26,8 @@ public class TestSubList {
         for (int i = 0; i < 100; i++) {
             list.add(String.valueOf(i));
         }
-        for (int i = 0; i < 100; i += 30) {
-            List<String> strings = list.subList(i, i + 30 < 100 ? i + 30 : 100);
+        for (int i = 0; i < 100;) {
+            List<String> strings = list.subList(i, (i += 30) < 100 ? i : 100);
             System.out.println(strings);
         }
 
