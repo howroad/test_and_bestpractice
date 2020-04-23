@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class TestChannel {
 
     public static void main(String[] args) {
+        //在server里面打断点测试，client会一直发送，不会阻塞
         new Thread(TestChannel::server).start();
         new Thread(TestChannel::client).start();
     }
