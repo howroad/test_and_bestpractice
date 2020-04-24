@@ -25,6 +25,7 @@ public class TestNioFile {
     public static void main(String[] args) {
 //        test1();
         //test2();
+        //FileChannel不能切换到非阻塞模式。而套接字通道都可以。
         test4();
     }
 

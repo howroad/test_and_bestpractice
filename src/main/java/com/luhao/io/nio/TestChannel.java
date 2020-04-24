@@ -1,5 +1,8 @@
 package com.luhao.io.nio;
 
+import com.luhao.io.nio.cankao.TestServerChannel2;
+import com.luhao.io.nio.diff.NioClient;
+
 /**
  * <p>Title: TestChannel.java</p>
  * <p>Description: </p>
@@ -11,10 +14,10 @@ package com.luhao.io.nio;
 public class TestChannel {
 
     public static void main(String[] args) {
-
+        new Thread(TestServerChannel2::selector).start();
+        new Thread(() -> NioClient.client(1,false)).start();
 
     }
-
 
 
 }
