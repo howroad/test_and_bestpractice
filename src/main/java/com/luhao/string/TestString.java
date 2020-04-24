@@ -1,7 +1,5 @@
 package com.luhao.string;
 
-import com.nstc.util.CastUtil;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -15,7 +13,7 @@ import java.util.Date;
  */
 public class TestString {
     public static void main(String[] args) {
-        test1();
+        //test1();
         test2();
     }
 
