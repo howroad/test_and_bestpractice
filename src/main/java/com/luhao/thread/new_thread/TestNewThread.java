@@ -48,7 +48,7 @@ public class TestNewThread {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
+        System.out.println("jieshu");
     }
 
     private static ThreadPoolExecutor exec = new ThreadPoolExecutor(10, 30,
