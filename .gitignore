@@ -5,3 +5,4 @@
 /.settings/
 *.class
 /src/test/
+.idea
