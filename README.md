@@ -1,2 +1,1 @@
-# JavaStudy
-用于学习的java工程
+studing test
