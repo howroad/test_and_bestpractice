@@ -5,5 +5,6 @@ install:install-file -Dfile=lib/ojdbc6-12.1.0.1.0.jar
                      -Dpackaging=Jar
 install:install-file -Dfile=lib/cpdetector-1.0.7.jar -DgroupId=cpdetector -DartifactId=cpdetector -Dversion=1.0.7 -Dpackaging=Jar
 install:install-file -Dfile=lib/FWKS-1.2.2.1.jar -DgroupId=com.nstc -DartifactId=fwks -Dversion=1.2.2.1 -Dpackaging=Jar
+install:install-file -Dfile=lib/nsutil14-3.0.0.jar -DgroupId=com.nstc -DartifactId=nstcutil -Dversion=14-3.0.0 -Dpackaging=Jar
 
 --idea maven -excute Maven Goal
